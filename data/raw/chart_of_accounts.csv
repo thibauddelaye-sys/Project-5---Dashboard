@@ -1,0 +1,15 @@
+account,label,type,department
+6011,Food purchases (F&B),expense,F&B
+6012,Beverage purchases (F&B),expense,F&B
+6061,Energy & utilities,expense,Undistributed
+6063,Cleaning & consumables,expense,Rooms
+6065,Laundry & linen,expense,Rooms
+6122,Equipment rental & leasing,expense,Undistributed
+6135,Maintenance & repairs,expense,Undistributed
+6161,Insurance,expense,Undistributed
+6181,Telecom & IT subscriptions,expense,A&G
+6226,Professional fees (legal/audit),expense,A&G
+6231,Advertising & marketing,expense,Sales & Mktg
+6251,Travel & representation,expense,A&G
+6257,OTA & booking commissions,expense,Sales & Mktg
+6064,Office supplies,expense,A&G

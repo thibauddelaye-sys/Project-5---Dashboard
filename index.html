@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Cockpit — AI-Assisted Invoice Processing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#FBF8F2; --paper2:#F4ECDF; --paper3:#FAF4E9; --card:#FFFFFF;
+    --red:#8C1C2B; --red-deep:#6E1422; --gold:#A8884F; --gold-soft:#C7B083;
+    --ink:#2C2520; --muted:#7A6D5E; --rule:#E4D9C6; --green:#3F6B4E; --amber:#B07A2A;
+    --display:"Cormorant Garamond",serif; --body:"EB Garamond",serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--body);color:var(--ink);background:var(--paper);
+    -webkit-font-smoothing:antialiased;}
+  a{color:inherit}
+
+  /* layout */
+  .app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+  .side{background:linear-gradient(180deg,var(--red-deep),var(--red));color:var(--paper);
+    padding:26px 20px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:30px}
+  .brand svg{width:30px;color:var(--gold-soft)}
+  .brand .t{font-family:var(--display);font-size:20px;line-height:1.05;font-weight:600}
+  .brand .s{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft)}
+  nav{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+  nav button{all:unset;cursor:pointer;padding:11px 13px;border-radius:7px;font-size:15px;
+    display:flex;gap:10px;align-items:center;color:#f3e3d8;transition:.15s}
+  nav button .n{font-family:var(--display);color:var(--gold-soft);font-size:13px;width:18px}
+  nav button:hover{background:rgba(255,255,255,.08)}
+  nav button.active{background:var(--paper);color:var(--red-deep);font-weight:600}
+  nav button.active .n{color:var(--red)}
+  .side .foot{margin-top:auto;font-size:11px;color:var(--gold-soft);line-height:1.5}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#7ed99a;margin-right:5px}
+
+  .main{padding:30px 38px 60px;max-width:1180px}
+  .page{display:none;animation:fade .4s ease}
+  .page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+  h1{font-family:var(--display);font-weight:600;color:var(--red);font-size:34px;margin:4px 0 2px}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:22px}
+  h2{font-family:var(--display);font-weight:600;color:var(--red-deep);font-size:22px;
+    margin:26px 0 12px;border-bottom:1px solid var(--gold);padding-bottom:6px}
+
+  /* cards / tiles */
+  .grid{display:grid;gap:16px}
+  .k6{grid-template-columns:repeat(3,1fr)}
+  .k3{grid-template-columns:repeat(3,1fr)}
+  .k2{grid-template-columns:1fr 1fr}
+  .tile{background:var(--card);border:1px solid var(--rule);border-top:3px solid var(--red);
+    border-radius:10px;padding:16px 18px;cursor:pointer;transition:.15s;position:relative}
+  .tile:hover{box-shadow:0 6px 20px rgba(110,20,34,.10);transform:translateY(-2px)}
+  .tile .lab{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .tile .val{font-family:var(--display);font-size:33px;font-weight:600;color:var(--ink);line-height:1.1;margin-top:3px}
+  .tile .delta{font-size:12.5px;color:var(--green);margin-top:2px}
+  .tile .info{position:absolute;top:11px;right:13px;color:var(--gold-soft);font-size:13px}
+
+  .panel{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;margin-top:16px}
+  .panel h3{font-family:var(--display);font-size:18px;color:var(--red-deep);margin:0 0 12px;font-weight:600}
+  .reco{background:linear-gradient(135deg,var(--red-deep),var(--red));color:var(--paper);
+    border-radius:12px;padding:22px 26px;margin:18px 0;display:flex;justify-content:space-between;
+    align-items:center;gap:24px;flex-wrap:wrap}
+  .reco .tag{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-soft)}
+  .reco .big{font-family:var(--display);font-size:27px;font-weight:600;margin-top:3px}
+  .reco .nums{display:flex;gap:30px;text-align:right}
+  .reco .nums .v{font-family:var(--display);font-size:30px;font-weight:700}
+  .reco .nums .l{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-soft)}
+
+  .insight{background:var(--paper2);border-left:3px solid var(--gold);padding:13px 16px;
+    border-radius:0 8px 8px 0;font-size:14.5px;line-height:1.5;color:var(--ink)}
+  .insight b{color:var(--red-deep)}
+
+  canvas{max-width:100%}
+  .twocol{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
+
+  /* calculator */
+  .calc{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .ctrl{margin-bottom:16px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted);margin-bottom:5px}
+  .ctrl label b{color:var(--red-deep);font-family:var(--display);font-size:16px}
+  input[type=range]{width:100%;accent-color:var(--red)}
+  .outs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .out{background:var(--paper3);border:1px solid var(--rule);border-radius:9px;padding:14px}
+  .out .l{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .out .v{font-family:var(--display);font-size:29px;font-weight:600;color:var(--red);margin-top:2px}
+  .out.alt .v{color:var(--ink)}
+
+  /* chips / filter */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 10px}
+  .chip{font-size:12.5px;padding:5px 11px;border:1px solid var(--gold-soft);border-radius:20px;
+    cursor:pointer;color:var(--muted);background:var(--card)}
+  .chip.on{background:var(--red);color:var(--paper);border-color:var(--red)}
+  .filter-note{font-size:12.5px;color:var(--gold);min-height:16px}
+
+  /* adoption shock */
+  .shock{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center;text-align:center;
+    background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+  .shock .half{padding:26px 18px}
+  .shock .half .v{font-family:var(--display);font-size:50px;font-weight:700;line-height:1}
+  .shock .half .l{font-size:13px;color:var(--muted);margin-top:6px}
+  .shock .hype .v{color:var(--gold)}
+  .shock .real .v{color:var(--red)}
+  .shock .vs{font-family:var(--display);font-style:italic;color:var(--muted);padding:0 8px;font-size:20px}
+  .shock .real{background:var(--paper2)}
+
+  /* timeline */
+  .tl{position:relative;margin:24px 6px 6px;padding-top:8px}
+  .tl .line{position:absolute;left:0;right:0;top:14px;height:2px;background:var(--gold-soft)}
+  .tl .stops{display:flex;justify-content:space-between;position:relative}
+  .tl .stop{flex:1;text-align:center;position:relative}
+  .tl .stop .pt{width:13px;height:13px;border-radius:50%;background:var(--card);
+    border:3px solid var(--gold);margin:0 auto 9px}
+  .tl .stop.key .pt{background:var(--red);border-color:var(--red-deep)}
+  .tl .stop .yr{font-family:var(--display);font-weight:600;color:var(--red-deep);font-size:17px}
+  .tl .stop .ev{font-size:12px;color:var(--muted);line-height:1.3;padding:0 6px}
+
+  /* governance flow */
+  .flow{display:flex;align-items:stretch;gap:0;margin:6px 0 4px;flex-wrap:wrap}
+  .step{flex:1;min-width:120px;background:var(--paper3);border:1px solid var(--rule);border-radius:10px;
+    padding:15px 13px;text-align:center}
+  .step.human{background:var(--red);color:var(--paper);border-color:var(--red-deep)}
+  .step .ic{font-family:var(--display);font-size:22px;color:var(--gold)}
+  .step.human .ic{color:var(--gold-soft)}
+  .step .t{font-weight:600;margin-top:4px;font-size:14.5px}
+  .step .d{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .step.human .d{color:#f0dcd0}
+  .arrow{display:flex;align-items:center;color:var(--gold);font-size:22px;padding:0 10px}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--paper2);border:1px solid var(--gold);
+    border-radius:30px;padding:8px 16px;font-size:14px;color:var(--red-deep);font-weight:600}
+  .badge .b{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold)}
+
+  .valnote{font-size:12.5px;color:var(--muted);margin-top:18px;padding-top:12px;border-top:1px dashed var(--rule)}
+  .valnote .pill{font-family:var(--body);font-size:11px;text-transform:uppercase;letter-spacing:.1em;
+    background:var(--green);color:#fff;padding:2px 8px;border-radius:4px;margin-right:6px}
+  .valnote .pill.amber{background:var(--amber)}
+
+  /* drill modal */
+  .modal{position:fixed;inset:0;background:rgba(44,37,32,.5);display:none;align-items:center;
+    justify-content:center;z-index:50}
+  .modal.on{display:flex}
+  .modal .box{background:var(--paper);border-radius:14px;max-width:520px;width:90%;padding:26px 28px;
+    border-top:5px solid var(--red);box-shadow:0 30px 80px rgba(0,0,0,.3)}
+  .modal h3{font-family:var(--display);color:var(--red);font-size:23px;margin:0 0 4px}
+  .modal .formula{font-family:ui-monospace,monospace;background:var(--paper2);padding:10px 12px;
+    border-radius:7px;font-size:13px;margin:12px 0;color:var(--red-deep)}
+  .modal .src{font-size:12.5px;color:var(--muted)}
+  .modal .x{float:right;cursor:pointer;color:var(--muted);font-size:20px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  th{text-align:left;color:var(--muted);font-weight:600;text-transform:uppercase;font-size:10.5px;
+    letter-spacing:.06em;padding:6px 8px;border-bottom:1px solid var(--gold)}
+  td{padding:6px 8px;border-bottom:1px solid var(--rule)}
+  .tt{font-size:11px;padding:2px 7px;border-radius:4px;font-weight:600}
+  .tt.ok{background:#e3efe7;color:var(--green)}
+  .tt.corr{background:#f6ebda;color:var(--amber)}
+  .tt.vat{background:#f4e0e2;color:var(--red)}
+  .loading{padding:60px;text-align:center;color:var(--muted);font-family:var(--display);font-size:20px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg viewBox="0 0 100 132" fill="currentColor" aria-hidden="true">
+        <path d="M50 5 C61 24 61 45 50 63 C39 45 39 24 50 5 Z"/>
+        <path d="M50 31 C44 41 35 45 27 43 C18 41 15 51 22 57 C29 63 42 61 47 50 C49 46 50 42 50 38 Z"/>
+        <path d="M50 31 C56 41 65 45 73 43 C82 41 85 51 78 57 C71 63 58 61 53 50 C51 46 50 42 50 38 Z"/>
+        <path d="M29 60 C40 56 60 56 71 60 L71 69 C60 65 40 65 29 69 Z"/>
+        <path d="M45 67 L55 67 C55 83 54 97 50 107 C46 97 45 83 45 67 Z"/>
+        <path d="M50 107 C45 115 34 119 27 119 C36 125 47 125 50 118 C53 125 64 125 73 119 C66 119 55 115 50 107 Z"/>
+      </svg>
+      <div><div class="t">AP Cockpit</div><div class="s">Maison Lumière</div></div>
+    </div>
+    <nav id="nav">
+      <button class="active" data-p="0"><span class="n">I</span>The Decision</button>
+      <button data-p="1"><span class="n">II</span>The Opportunity</button>
+      <button data-p="2"><span class="n">III</span>Adoption vs Hype</button>
+      <button data-p="3"><span class="n">IV</span>Governance &amp; Trust</button>
+    </nav>
+    <div class="foot">
+      <div><span class="dot"></span><span id="status">connecting…</span></div>
+      <div id="updated" style="margin-top:6px"></div>
+      <div style="margin-top:10px;opacity:.8">AI assists,<br>humans decide.</div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="loading">Loading the cockpit…</div>
+  </main>
+</div>
+
+<div class="modal" id="modal"><div class="box">
+  <span class="x" onclick="closeModal()">✕</span>
+  <h3 id="m-title"></h3><div id="m-body"></div>
+</div></div>
+
+<script>
+const E = (h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild;};
+const eur = (n)=> "€"+Math.round(n).toLocaleString('en-US');
+const pct = (n)=> (n*100).toFixed(0)+"%";
+let D=null, charts={}, filterDept=null;
+
+const DEPT_COLORS = {Rooms:'#8C1C2B','F&B':'#A8884F','A&G':'#6E1422','Sales & Mktg':'#C7B083','Undistributed':'#7A6D5E'};
+
+async function boot(){
+  try{
+    const r = await fetch('/data'); D = await r.json();
+    if(D.error){ document.getElementById('status').textContent='API error'; }
+    else { document.getElementById('status').textContent='live · auto-refresh'; }
+    document.getElementById('updated').textContent = D.updated_at ? ('updated '+new Date(D.updated_at).toLocaleTimeString()) : '';
+    render();
+  }catch(e){ document.getElementById('main').innerHTML='<div class="loading">Cannot reach the server.<br><small>'+e+'</small></div>'; }
+}
+
+function render(){
+  const m = document.getElementById('main');
+  m.innerHTML='';
+  m.appendChild(pageDecision());
+  m.appendChild(pageOpportunity());
+  m.appendChild(pageAdoption());
+  m.appendChild(pageGovernance());
+  drawDecisionCharts(); drawOpportunityCharts(); drawAdoptionCharts();
+  runCalc();
+}
+
+/* ---------------- PAGE I — DECISION ---------------- */
+function pageDecision(){
+  const k=D.kpis, s=D.savings;
+  const p=E('<section class="page active" data-page="0"></section>');
+  p.innerHTML = `
+    <div class="eyebrow">Project 5 · The decision in ten seconds</div>
+    <h1>Is AI-assisted invoice processing worth it?</h1>
+    <div class="sub">A 12-month pilot at an independent 5★ hotel — what the numbers say, and the honest recommendation.</div>
+    <div class="grid k6" id="tiles"></div>
+    <div class="reco">
+      <div><div class="tag">Recommendation</div><div class="big">🟡 Run the pilot — don't wait, don't yet invest at full scale</div></div>
+      <div class="nums">
+        <div><div class="v">${eur(s.annual_cost_saving)}</div><div class="l">saved / year*</div></div>
+        <div><div class="v">${Math.round(s.annual_hours_returned)}</div><div class="l">hours returned*</div></div>
+        <div><div class="v">${s.annual_fte_equiv}</div><div class="l">FTE freed*</div></div>
+      </div>
+    </div>
+    <div class="twocol">
+      <div class="panel"><h3>Touchless rate — the pilot ramp</h3><canvas id="c_touchless" height="150"></canvas></div>
+      <div class="panel"><h3>The AI's read</h3>
+        <div class="insight">Straight-through processing rose from <b>${pct(k.touchless_first)}</b> to <b>${pct(k.touchless_latest)}</b> across the pilot, as the model matured and more suppliers moved to structured e-invoices (now <b>${pct(k.einvoice_share)}</b> of volume). Account-proposal accuracy held at <b>${pct(k.accuracy)}</b>, with <b>${pct(k.exception_rate)}</b> routed to a human — by design. Back-office efficiency of this order protects roughly <b>1–2 pts of GOP</b>, the margin lever that matters most while Western-Europe hotel margins sit near 33%.</div>
+      </div>
+    </div>
+    <div class="valnote">* Projected at the client's real volume via the calculator (page II), not raw pilot totals — see assumptions.
+      <div style="margin-top:8px"><span class="pill">robust</span>pilot KPIs measured on processed invoices &nbsp; <span class="pill amber">validate</span>baselines (manual cost/time, volume) to confirm with client</div>
+    </div>`;
+  // tiles
+  const tiles=[
+    ['Touchless rate', pct(k.touchless_rate), `+${Math.round((k.touchless_latest-k.touchless_first)*100)} pts over pilot`, 'touchless'],
+    ['Account accuracy', pct(k.accuracy), 'AI proposal vs validated entry', 'accuracy'],
+    ['Hours returned (YTD)', Math.round(k.hours_saved_ytd), 'finance time freed', 'hours'],
+    ['Saved (YTD)', eur(k.cost_saved_ytd), 'vs manual baseline', 'saved'],
+    ['Cost / invoice', eur(k.spend_net_ytd/k.invoices_ytd*0+ (k.cost_saved_ytd/k.invoices_ytd)), '', 'cpi'],
+    ['e-invoice share', pct(k.einvoice_share), 'ViDA tailwind', 'einv'],
+  ];
+  // fix cost/invoice tile to show automated cost vs manual €12
+  tiles[4][1]= eur(12 - (k.cost_saved_ytd/k.invoices_ytd)); tiles[4][2]='vs €12 manual';
+  const g=p.querySelector('#tiles');
+  tiles.forEach(t=> g.appendChild(tile(t[0],t[1],t[2],t[3])));
+  return p;
+}
+function tile(lab,val,delta,key){
+  const el=E(`<div class="tile"><span class="info">ⓘ</span><div class="lab">${lab}</div><div class="val">${val}</div><div class="delta">${delta||''}</div></div>`);
+  el.onclick=()=>drill(key);
+  return el;
+}
+
+/* ---------------- PAGE II — OPPORTUNITY ---------------- */
+function pageOpportunity(){
+  const p=E('<section class="page" data-page="1"></section>');
+  p.innerHTML=`
+    <div class="eyebrow">Sizing the opportunity · USALI departments</div>
+    <h1>How much do we actually get back?</h1>
+    <div class="sub">Move the sliders to your real numbers — the whole ROI recomputes live against the API.</div>
+    <div class="panel"><div class="calc">
+      <div>
+        <div class="ctrl"><label>Monthly invoice volume <b id="lv">420</b></label><input id="sv" type="range" min="50" max="1200" step="10" value="420"></div>
+        <div class="ctrl"><label>Touchless target <b id="lt">75%</b></label><input id="st" type="range" min="40" max="95" step="1" value="75"></div>
+        <div class="ctrl"><label>Manual cost / invoice <b id="lc">€12</b></label><input id="sc" type="range" min="6" max="20" step="0.5" value="12"></div>
+        <div class="ctrl"><label>Finance loaded rate <b id="lr">€45/h</b></label><input id="sr" type="range" min="30" max="70" step="1" value="45"></div>
+      </div>
+      <div class="outs">
+        <div class="out"><div class="l">Annual cost saving</div><div class="v" id="o_save">—</div></div>
+        <div class="out alt"><div class="l">Hours returned / yr</div><div class="v" id="o_hours">—</div></div>
+        <div class="out alt"><div class="l">FTE equivalent</div><div class="v" id="o_fte">—</div></div>
+        <div class="out"><div class="l">Saving / invoice</div><div class="v" id="o_per">—</div></div>
+      </div>
+    </div></div>
+    <div class="twocol">
+      <div class="panel"><h3>Spend by USALI department</h3>
+        <div class="chips" id="deptchips"></div>
+        <div class="filter-note" id="fnote"></div>
+        <canvas id="c_dept" height="170"></canvas></div>
+      <div class="panel"><h3>Manual vs automated</h3><canvas id="c_cmp" height="170"></canvas></div>
+    </div>
+    <div class="panel"><h3>Supplier concentration — top vendors by spend</h3><canvas id="c_vendor" height="120"></canvas></div>`;
+  return p;
+}
+
+/* ---------------- PAGE III — ADOPTION ---------------- */
+function pageAdoption(){
+  const ev=Object.fromEntries(D.evidence.map(r=>[r.metric, r]));
+  const get=(k,f)=> ev[k]? (ev[k].value_text||ev[k].value_num) : f;
+  const p=E('<section class="page" data-page="2"></section>');
+  p.innerHTML=`
+    <div class="eyebrow">Signals vs hype · why now</div>
+    <h1>Is it credible to act now?</h1>
+    <div class="sub">The gap between the headlines and what hotels actually deploy is the whole story.</div>
+    <div class="shock">
+      <div class="half hype"><div class="v">98%</div><div class="l">of hotel owners say they've "adopted AI" (headlines)</div></div>
+      <div class="vs">vs</div>
+      <div class="half real"><div class="v">~6%</div><div class="l">of EU hospitality firms actually deploy AI — Eurostat, 2023</div></div>
+    </div>
+    <div class="twocol" style="margin-top:16px">
+      <div class="panel"><h3>Where AI is really used (back-office, not the guest)</h3><canvas id="c_adopt" height="150"></canvas></div>
+      <div class="panel"><h3>The pressure behind it</h3>
+        <div class="grid k3" style="grid-template-columns:1fr">
+          <div class="insight" style="margin-bottom:10px"><b>Margins</b> — Western-Europe hotel GOP ~33%, the lowest in Europe; revenue growth no longer expands margin.</div>
+          <div class="insight" style="margin-bottom:10px"><b>Talent</b> — EU hospitality is short ~10% of its workforce; you can't cut your way out.</div>
+          <div class="insight"><b>Back-office cost</b> — manual invoicing ~€12 &amp; ~15 min; automation ~€2–5 &amp; ~3 min.</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel"><h3>Why now — the regulatory wave (ViDA &amp; Luxembourg e-invoicing)</h3>
+      <div class="tl"><div class="line"></div><div class="stops">
+        <div class="stop key"><div class="pt"></div><div class="yr">2025</div><div class="ev">ViDA adopted (EU)</div></div>
+        <div class="stop"><div class="pt"></div><div class="yr">2026</div><div class="ev">Belgium B2B · LU law expected</div></div>
+        <div class="stop"><div class="pt"></div><div class="yr">2027</div><div class="ev">France B2B phase-in</div></div>
+        <div class="stop key"><div class="pt"></div><div class="yr">2028–29</div><div class="ev">LU domestic B2B e-invoicing</div></div>
+        <div class="stop key"><div class="pt"></div><div class="yr">2030</div><div class="ev">Intra-EU B2B mandatory (EN 16931)</div></div>
+      </div></div>
+      <div class="insight" style="margin-top:18px">Structured invoices are becoming the <b>default</b>. Automating now means riding the wave — not scrambling to comply in 2028–29. Luxembourg Peppol e-invoices already jumped from <b>under 100 (2021) to ~1.4 M (2024)</b>.</div>
+    </div>
+    <div class="valnote"><span class="pill">robust</span>adoption &amp; regulatory figures are official (Eurostat, EU/KPMG) &nbsp; <span class="pill amber">validate</span>vendor ROI claims treated as upper-bound</div>`;
+  return p;
+}
+
+/* ---------------- PAGE IV — GOVERNANCE ---------------- */
+function pageGovernance(){
+  const g=D.governance;
+  const p=E('<section class="page" data-page="3"></section>');
+  p.innerHTML=`
+    <div class="eyebrow">The differentiator · AI assists, humans decide</div>
+    <h1>And the risk?</h1>
+    <div class="sub">Every posted entry has a human behind it. The design is the compliance story.</div>
+    <div class="panel"><h3>How a single invoice flows</h3>
+      <div class="flow">
+        <div class="step"><div class="ic">▤</div><div class="t">Invoice in</div><div class="d">email · PDF · e-invoice</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="ic">◇</div><div class="t">AI proposes</div><div class="d">account · VAT · allocation</div></div>
+        <div class="arrow">→</div>
+        <div class="step human"><div class="ic">✓</div><div class="t">Human validates</div><div class="d">reviews &amp; approves</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="ic">▦</div><div class="t">Posting</div><div class="d">to the ledger</div></div>
+      </div>
+    </div>
+    <div class="twocol">
+      <div class="panel"><h3>EU AI Act posture</h3>
+        <div class="badge"><span class="b">Class</span> ${g.eu_ai_act_class}</div>
+        <p style="font-size:14px;color:var(--muted);line-height:1.5;margin-top:12px">${g.eu_ai_act_reason}</p>
+        <table>
+          <tr><td>Autonomous posting</td><td><b style="color:var(--red)">No — never</b></td></tr>
+          <tr><td>Human-in-the-loop</td><td><b style="color:var(--green)">Yes — native</b></td></tr>
+          <tr><td>Invoices reviewed by a human</td><td><b>${g.invoices_reviewed_by_human}</b> (${pct(g.share_human_reviewed)})</td></tr>
+          <tr><td>Non-deductible VAT routed to human</td><td><b>${g.non_deductible_vat_routed_to_human}</b></td></tr>
+        </table>
+      </div>
+      <div class="panel"><h3>GDPR — data in scope</h3>
+        <div class="insight">${g.gdpr_personal_data_in_scope}. No special-category data. The client's real ledger is never ingested — the system runs on the invoice document plus the vendor master.</div>
+        <div style="margin-top:14px;font-size:14px;color:var(--muted);line-height:1.6">
+          <b style="color:var(--red-deep)">Where the model is weak (honest):</b> scanned PDFs from new suppliers and non-deductible-VAT cases are the main error sources — which is exactly why those are routed to a human rather than auto-posted.</div>
+      </div>
+    </div>
+    <div class="valnote"><span class="pill">robust</span>flow &amp; controls are design facts &nbsp; <span class="pill amber">validate</span>full DPIA &amp; AI-Act technical file = Final-Project deliverables</div>`;
+  return p;
+}
+
+/* ---------------- CHARTS ---------------- */
+function lux(ctx){return ctx;}
+function drawDecisionCharts(){
+  const m=D.monthly;
+  charts.touch && charts.touch.destroy();
+  charts.touch=new Chart(document.getElementById('c_touchless'),{
+    type:'line',
+    data:{labels:m.map(r=>r.month),datasets:[{data:m.map(r=>r.touchless_rate*100),
+      borderColor:'#8C1C2B',backgroundColor:'rgba(140,28,43,.08)',fill:true,tension:.35,
+      pointBackgroundColor:'#A8884F',pointRadius:3}]},
+    options:opts('%')});
+}
+function drawOpportunityCharts(){
+  drawDept(); 
+  charts.cmp && charts.cmp.destroy();
+  charts.cmp=new Chart(document.getElementById('c_cmp'),{
+    type:'bar',
+    data:{labels:['Cost / invoice (€)','Handling (min)','Cycle (days)'],
+      datasets:[
+        {label:'Manual',data:[12,15,14.6],backgroundColor:'#C7B083'},
+        {label:'Automated',data:[3.5,3,4],backgroundColor:'#8C1C2B'}]},
+    options:opts('',true)});
+  const v=D.spendVendor.slice(0,8);
+  charts.vendor && charts.vendor.destroy();
+  charts.vendor=new Chart(document.getElementById('c_vendor'),{
+    type:'bar',
+    data:{labels:v.map(r=>r.vendor_name),datasets:[{data:v.map(r=>r.spend_net),
+      backgroundColor:'#6E1422'}]},
+    options:{...opts('€'),indexAxis:'y',plugins:{legend:{display:false}}}});
+}
+function drawDept(){
+  let d=D.spendDept;
+  charts.dept && charts.dept.destroy();
+  charts.dept=new Chart(document.getElementById('c_dept'),{
+    type:'doughnut',
+    data:{labels:d.map(r=>r.department),datasets:[{data:d.map(r=>r.spend_net),
+      backgroundColor:d.map(r=>filterDept&&r.department!==filterDept?'#e8ddc9':(DEPT_COLORS[r.department]||'#7A6D5E')),
+      borderColor:'#FBF8F2',borderWidth:2}]},
+    options:{plugins:{legend:{position:'right',labels:{font:{family:'EB Garamond',size:12}}}}}});
+  const chips=document.getElementById('deptchips'); chips.innerHTML='';
+  d.forEach(r=>{const c=E(`<div class="chip ${filterDept===r.department?'on':''}">${r.department}</div>`);
+    c.onclick=()=>{filterDept=filterDept===r.department?null:r.department;drawDept();
+      document.getElementById('fnote').textContent=filterDept?`Filtered: ${filterDept} · ${eur(r.spend_net)} net spend`:'';};
+    chips.appendChild(c);});
+}
+function drawAdoptionCharts(){
+  charts.adopt && charts.adopt.destroy();
+  charts.adopt=new Chart(document.getElementById('c_adopt'),{
+    type:'bar',
+    data:{labels:['Back-office efficiency','Energy mgmt','Revenue opt.','Guest personalization'],
+      datasets:[{data:[64,54,53,9],backgroundColor:['#8C1C2B','#A8884F','#A8884F','#C7B083']}]},
+    options:{...opts('%',false),indexAxis:'y',plugins:{legend:{display:false}}}});
+}
+function opts(unit,legend){return{
+  responsive:true,maintainAspectRatio:true,
+  plugins:{legend:{display:!!legend,labels:{font:{family:'EB Garamond',size:12}}},
+    tooltip:{callbacks:{label:(c)=>` ${c.dataset.label?c.dataset.label+': ':''}${c.parsed.y??c.parsed.x}${unit}`}}},
+  scales:{x:{grid:{display:false},ticks:{font:{family:'EB Garamond',size:11}}},
+    y:{grid:{color:'#Eee6d6'},ticks:{font:{family:'EB Garamond',size:11}}}}};}
+
+/* ---------------- CALCULATOR ---------------- */
+let calcT=null;
+function bindCalc(){
+  ['sv','st','sc','sr'].forEach(id=>{const el=document.getElementById(id); if(el) el.oninput=()=>{ syncLabels(); clearTimeout(calcT); calcT=setTimeout(runCalc,120); };});
+}
+function syncLabels(){
+  const g=(id)=>document.getElementById(id);
+  if(!g('sv'))return;
+  g('lv').textContent=g('sv').value; g('lt').textContent=g('st').value+'%';
+  g('lc').textContent='€'+(+g('sc').value).toFixed(0); g('lr').textContent='€'+g('sr').value+'/h';
+}
+async function runCalc(){
+  if(!document.getElementById('sv'))return;
+  syncLabels();
+  const q=new URLSearchParams({monthly_volume:document.getElementById('sv').value,
+    touchless_target:(+document.getElementById('st').value/100),
+    manual_cost:document.getElementById('sc').value, rate:document.getElementById('sr').value});
+  try{const r=await fetch('/calc?'+q); const s=await r.json();
+    document.getElementById('o_save').textContent=eur(s.annual_cost_saving);
+    document.getElementById('o_hours').textContent=Math.round(s.annual_hours_returned).toLocaleString();
+    document.getElementById('o_fte').textContent=s.annual_fte_equiv;
+    document.getElementById('o_per').textContent=eur(s.saving_per_invoice);
+  }catch(e){}
+}
+
+/* ---------------- DRILL MODAL ---------------- */
+const DRILL={
+  touchless:['Touchless rate','touchless invoices ÷ total invoices','Synthetic pilot data (ap_entries.csv). An invoice is touchless when the AI proposal is accepted with no human correction.'],
+  accuracy:['Account accuracy','final_account == vendor default account','Backtest of AI-proposed vs validated entries.'],
+  hours:['Hours returned','Σ (manual_minutes − actual_minutes) ÷ 60','Manual baseline 15 min (Artsyl). Validate with client.'],
+  saved:['Cost saved (YTD)','Σ (€12 − automated_cost) per invoice','Manual baseline ~€12/invoice (HighRadius/Quadient). USD-derived, indicative.'],
+  cpi:['Cost / invoice','(avg minutes ÷ 60) × €45 loaded rate + €0.80 processing','Loaded finance rate is an assumption to confirm with the client.'],
+  einv:['e-invoice share','e-invoice channel ÷ all channels','Rising with ViDA / Peppol adoption (EU Commission).'],
+};
+function drill(k){const d=DRILL[k]; if(!d)return;
+  document.getElementById('m-title').textContent=d[0];
+  document.getElementById('m-body').innerHTML=`<div class="formula">${d[1]}</div><div class="src">Source: ${d[2]}</div>`;
+  document.getElementById('modal').classList.add('on');}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
+
+/* ---------------- NAV ---------------- */
+document.getElementById('nav').addEventListener('click',(e)=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  const i=+b.dataset.p;
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.toggle('active', +pg.dataset.page===i));
+  if(i===1){ bindCalc(); runCalc(); }
+  window.scrollTo(0,0);
+});
+document.getElementById('modal').addEventListener('click',(e)=>{if(e.target.id==='modal')closeModal();});
+
+boot();
+setInterval(boot, 60000); // mirror the server's auto-refresh
+</script>
+</body>
+</html>

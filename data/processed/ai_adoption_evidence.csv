@@ -1,0 +1,33 @@
+id,pillar,metric,value_num,value_text,unit,geography,year,source,source_type
+E001,Margin,European hotel GOP margin,36.5,,%,Europe,2025,HotStats via HOTELSMag,industry
+E002,Margin,Western Europe GOP margin,33.3,,%,Western Europe,2025,HotStats via HOTELSMag,industry
+E003,Margin,Payroll share of operating costs,35.0,>35,%,EU full-service,2025,HOTREC & Eurostat,official
+E004,Talent,Hospitality workforce gap,10.0,~10,%,EU,2026,HOTREC,industry
+E005,Talent,Vacancy rate (Q1),4.0,3.5-4.2,%,EU,2025,Eurostat,official
+E006,Talent,Employees with essential digital skills,15.0,<15,%,EU hospitality,2023,Eurostat DESI,official
+E007,Talent,Hospitality jobs,10.5,10-11M,million jobs,EU27,2026,HOTREC,industry
+E008,AP cost,Cost per invoice — manual,12.0,11-15,EUR,Global,2025,HighRadius/Quadient/Nanonets,vendor
+E009,AP cost,Cost per invoice — automated,3.5,2-5,EUR,Global,2025,HighRadius/Quadient/Nanonets,vendor
+E010,AP cost,Cycle time — manual,14.6,,days,Global,2025,DocuClipper/Ascend,vendor
+E011,AP cost,Cycle time — automated,4.0,3-5,days,Global,2025,DocuClipper/Ascend,vendor
+E012,AP cost,Handling time — manual,15.0,,minutes,Global,2025,Artsyl,vendor
+E013,AP cost,Handling time — automated,3.0,,minutes,Global,2025,Artsyl,vendor
+E014,AP cost,Teams still keying manually,68.0,,%,Global,2025,DocuClipper,vendor
+E015,AP cost,AP automation market CAGR,12.8,,% CAGR,Global,2025,Grand View via DocuClipper,vendor
+E016,Adoption,Hospitality enterprises deploying AI,6.0,~6,%,EU,2023,Eurostat,official
+E017,Adoption,Knowledge-sector enterprises deploying AI,20.0,>20,%,EU,2023,Eurostat,official
+E018,Adoption,Hotels with a formal AI strategy,8.0,,%,Global,2025,h2c/Profitroom,vendor
+E019,Adoption,AI trust score,6.6,,/10,Global,2025,h2c/Profitroom,vendor
+E020,Adoption,AI reliance score,4.7,,/10,Global,2025,h2c/Profitroom,vendor
+E021,Adoption,Owners using AI for back-office efficiency,64.0,,%,Global,2026,Goldrich,industry
+E022,Adoption,Owners using AI for guest personalization,9.0,,%,Global,2026,Goldrich,industry
+E023,Adoption,Hospitality AI market 2020,10.3,,USD billion,Global,2020,EHL,forecast
+E024,Adoption,Hospitality AI market 2031,110.6,,USD billion,Global,2031,EHL,forecast
+E025,Regulatory,ViDA intra-EU B2B e-invoicing mandatory,2030.0,,year,EU,2025,EU Council/KPMG,official
+E026,Regulatory,Luxembourg national e-invoicing law expected,2026.0,,year,Luxembourg,2025,KPMG/VATupdate,official
+E027,Regulatory,Luxembourg domestic B2B e-invoicing likely,2028.0,2028-2029,year,Luxembourg,2025,KPMG/VATupdate,official
+E028,Regulatory,Luxembourg Peppol e-invoices,1400000.0,,invoices/yr,Luxembourg,2024,European Commission,official
+E029,Regulatory,Belgium B2B e-invoicing mandatory,2026.0,,year,Belgium,2025,Novutech/Marosa,official
+E030,Sizing,Hotels & similar establishments,216.0,211-216,count,Luxembourg,2023,STATEC,official
+E031,Sizing,Hotel rooms,7800.0,"~7,800",count,Luxembourg,2023,STATEC,official
+E032,Sizing,Tourist arrivals,1400000.0,,arrivals/yr,Luxembourg,2023,STATEC,official

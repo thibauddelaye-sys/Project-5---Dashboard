@@ -1,0 +1,15 @@
+vendor_id,vendor_name,default_account,vat_treatment,channel,annual_invoices,department
+V001,Cactus Wholesale Food,6011,RED3,pdf,180,F&B
+V002,Vins & Domaines Moselle,6012,STD17,pdf,60,F&B
+V003,Enovos Luxembourg (energy),6061,STD17,einvoice,12,Undistributed
+V004,CleanPro Supplies,6063,STD17,pdf,48,Rooms
+V005,Elis Luxembourg (laundry),6065,STD17,einvoice,24,Rooms
+V006,TechRent Equipment,6122,STD17,email,18,Undistributed
+V007,BâtiServ Maintenance,6135,STD17,email,40,Undistributed
+V008,Foyer Assurances,6161,ND,pdf,8,Undistributed
+V009,POST Telecom / IT SaaS,6181,STD17,einvoice,20,A&G
+V010,Audit & Conseil S.à r.l.,6226,STD17,pdf,6,A&G
+V011,Brand Studio Marketing,6231,STD17,email,16,Sales & Mktg
+V012,Représentation & Events,6251,ND,pdf,22,A&G
+V013,Booking.com Commissions,6257,STD17,einvoice,14,Sales & Mktg
+V014,Office Direct LU,6064,STD17,email,30,A&G

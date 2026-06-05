@@ -1,0 +1,9 @@
+{
+  "name": "ap-cockpit-web",
+  "version": "1.0.0",
+  "description": "Live web cockpit for the AI-assisted AP automation case (reads the AP API).",
+  "type": "module",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "express": "^4.21.2" }
+}
