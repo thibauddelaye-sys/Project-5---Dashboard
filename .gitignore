@@ -3,3 +3,4 @@ venv/
 __pycache__/
 *.pyc
 .railway/
+deploy/node_modules/
