@@ -158,26 +158,30 @@ def evidence(pillar: str | None = None, _: None = Depends(auth)):
 @app.get("/api/savings", tags=["decision"])
 def savings(monthly_volume: int = Query(420, ge=1),
             touchless_target: float = Query(0.75, ge=0, le=1),
-            manual_cost: float = Query(MANUAL_COST),
             manual_minutes: float = Query(MANUAL_MIN),
             rate: float = Query(RATE),
             auto_minutes_touchless: float = 2.5,
             auto_minutes_review: float = 9.0,
+            manual_overhead: float = 0.75,    # print / archive / error correction per invoice
+            software_surcharge: float = 0.8,  # IDP/LLM + hosting per invoice
             _: None = Depends(auth)):
     """Opportunity calculator: project annual savings at the client's real volume.
 
-    The whole ROI re-computes from these inputs, so assumptions are transparent and
-    swappable for the client's real numbers.
+    Single labour-cost lever (the hourly rate). BOTH the manual and the automated cost per
+    invoice are DERIVED from it via their respective handling times, so lowering the rate
+    correctly lowers both costs (and the absolute saving) — they can never contradict.
     """
     annual = monthly_volume * 12
+    manual_cost = (manual_minutes / 60) * rate + manual_overhead
     # blended automated handling time given the target touchless rate
     auto_min = (touchless_target * auto_minutes_touchless
                 + (1 - touchless_target) * auto_minutes_review)
-    auto_cost = (auto_min / 60) * rate + 0.8
+    auto_cost = (auto_min / 60) * rate + software_surcharge
     saving_per_invoice = manual_cost - auto_cost
     minutes_saved = (manual_minutes - auto_min) * annual
     return {
         "annual_invoices": annual,
+        "manual_cost_per_invoice": round(manual_cost, 2),
         "blended_auto_minutes": round(auto_min, 2),
         "auto_cost_per_invoice": round(auto_cost, 2),
         "saving_per_invoice": round(saving_per_invoice, 2),

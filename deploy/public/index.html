@@ -261,11 +261,11 @@ function pageDecision(){
     ['Account accuracy', pct(k.accuracy), 'AI proposal vs validated entry', 'accuracy'],
     ['Hours returned (YTD)', Math.round(k.hours_saved_ytd), 'finance time freed', 'hours'],
     ['Saved (YTD)', eur(k.cost_saved_ytd), 'vs manual baseline', 'saved'],
-    ['Cost / invoice', eur(k.spend_net_ytd/k.invoices_ytd*0+ (k.cost_saved_ytd/k.invoices_ytd)), '', 'cpi'],
+    ['Processing cost / invoice', '', '', 'cpi'],
     ['e-invoice share', pct(k.einvoice_share), 'ViDA tailwind', 'einv'],
   ];
   // fix cost/invoice tile to show automated cost vs manual €12
-  tiles[4][1]= eur(12 - (k.cost_saved_ytd/k.invoices_ytd)); tiles[4][2]='vs €12 manual';
+  tiles[4][1]= eur(12 - (k.cost_saved_ytd/k.invoices_ytd)); tiles[4][2]='labour · vs €12 manual';
   const g=p.querySelector('#tiles');
   tiles.forEach(t=> g.appendChild(tile(t[0],t[1],t[2],t[3])));
   return p;
@@ -287,7 +287,7 @@ function pageOpportunity(){
       <div>
         <div class="ctrl"><label>Monthly invoice volume <b id="lv">420</b></label><input id="sv" type="range" min="50" max="1200" step="10" value="420"></div>
         <div class="ctrl"><label>Touchless target <b id="lt">75%</b></label><input id="st" type="range" min="40" max="95" step="1" value="75"></div>
-        <div class="ctrl"><label>Manual cost / invoice <b id="lc">€12</b></label><input id="sc" type="range" min="6" max="20" step="0.5" value="12"></div>
+        <div class="ctrl"><label>Manual handling time <b id="lm">15 min</b></label><input id="sm" type="range" min="5" max="30" step="1" value="15"></div>
         <div class="ctrl"><label>Finance loaded rate <b id="lr">€45/h</b></label><input id="sr" type="range" min="30" max="70" step="1" value="45"></div>
       </div>
       <div class="outs">
@@ -296,7 +296,8 @@ function pageOpportunity(){
         <div class="out alt"><div class="l">FTE equivalent</div><div class="v" id="o_fte">—</div></div>
         <div class="out"><div class="l">Saving / invoice</div><div class="v" id="o_per">—</div></div>
       </div>
-    </div></div>
+    </div>
+    <div id="costline" style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--rule);font-size:14px;color:var(--muted)"></div></div>
     <div class="twocol">
       <div class="panel"><h3>Spend by USALI department</h3>
         <div class="chips" id="deptchips"></div>
@@ -449,25 +450,27 @@ function opts(unit,legend){return{
 /* ---------------- CALCULATOR ---------------- */
 let calcT=null;
 function bindCalc(){
-  ['sv','st','sc','sr'].forEach(id=>{const el=document.getElementById(id); if(el) el.oninput=()=>{ syncLabels(); clearTimeout(calcT); calcT=setTimeout(runCalc,120); };});
+  ['sv','st','sm','sr'].forEach(id=>{const el=document.getElementById(id); if(el) el.oninput=()=>{ syncLabels(); clearTimeout(calcT); calcT=setTimeout(runCalc,120); };});
 }
 function syncLabels(){
   const g=(id)=>document.getElementById(id);
   if(!g('sv'))return;
   g('lv').textContent=g('sv').value; g('lt').textContent=g('st').value+'%';
-  g('lc').textContent='€'+(+g('sc').value).toFixed(0); g('lr').textContent='€'+g('sr').value+'/h';
+  g('lm').textContent=g('sm').value+' min'; g('lr').textContent='€'+g('sr').value+'/h';
 }
 async function runCalc(){
   if(!document.getElementById('sv'))return;
   syncLabels();
   const q=new URLSearchParams({monthly_volume:document.getElementById('sv').value,
     touchless_target:(+document.getElementById('st').value/100),
-    manual_cost:document.getElementById('sc').value, rate:document.getElementById('sr').value});
+    manual_minutes:document.getElementById('sm').value, rate:document.getElementById('sr').value});
   try{const r=await fetch('/calc?'+q); const s=await r.json();
     document.getElementById('o_save').textContent=eur(s.annual_cost_saving);
     document.getElementById('o_hours').textContent=Math.round(s.annual_hours_returned).toLocaleString();
     document.getElementById('o_fte').textContent=s.annual_fte_equiv;
     document.getElementById('o_per').textContent=eur(s.saving_per_invoice);
+    const cl=document.getElementById('costline');
+    if(cl) cl.innerHTML=`Processing cost per invoice: <b style="color:var(--red-deep)">${eur(s.manual_cost_per_invoice)} manual</b> → <b style="color:var(--green)">${eur(s.auto_cost_per_invoice)} automated</b> &nbsp;·&nbsp; both derived from the €${document.getElementById('sr').value}/h rate, so lowering the rate lowers both.`;
   }catch(e){}
 }
 
@@ -477,7 +480,7 @@ const DRILL={
   accuracy:['Account accuracy','final_account == vendor default account','Backtest of AI-proposed vs validated entries.'],
   hours:['Hours returned','Σ (manual_minutes − actual_minutes) ÷ 60','Manual baseline 15 min (Artsyl). Validate with client.'],
   saved:['Cost saved (YTD)','Σ (€12 − automated_cost) per invoice','Manual baseline ~€12/invoice (HighRadius/Quadient). USD-derived, indicative.'],
-  cpi:['Cost / invoice','(avg minutes ÷ 60) × €45 loaded rate + €0.80 processing','Loaded finance rate is an assumption to confirm with the client.'],
+  cpi:['Processing cost / invoice','labour: (avg minutes ÷ 60) × €45 loaded rate + €0.80 software','This is the cost to PROCESS an invoice (≈15 min of finance time), NOT the invoice amount. The loaded rate is an assumption to confirm with the client.'],
   einv:['e-invoice share','e-invoice channel ÷ all channels','Rising with ViDA / Peppol adoption (EU Commission).'],
 };
 function drill(k){const d=DRILL[k]; if(!d)return;
