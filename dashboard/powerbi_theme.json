@@ -1,0 +1,54 @@
+{
+  "name": "Maison Lumiere — Luxe AP",
+  "dataColors": [
+    "#8C1C2B",
+    "#A8884F",
+    "#6E1422",
+    "#C7B083",
+    "#7A6D5E",
+    "#B98A8F",
+    "#3F6B4E",
+    "#B07A2A"
+  ],
+  "foreground": "#2C2520",
+  "foregroundNeutralSecondary": "#7A6D5E",
+  "foregroundNeutralTertiary": "#B7AB99",
+  "background": "#FBF8F2",
+  "backgroundLight": "#F4ECDF",
+  "backgroundNeutral": "#EFE6D5",
+  "tableAccent": "#A8884F",
+  "good": "#3F6B4E",
+  "neutral": "#B07A2A",
+  "bad": "#B23A48",
+  "maximum": "#8C1C2B",
+  "center": "#C7B083",
+  "minimum": "#F4ECDF",
+  "null": "#E4D9C6",
+  "hyperlink": "#6E1422",
+  "textClasses": {
+    "callout": { "fontFace": "Constantia", "fontSize": 30, "color": "#8C1C2B" },
+    "title":   { "fontFace": "Constantia", "fontSize": 15, "color": "#8C1C2B" },
+    "header":  { "fontFace": "Constantia", "fontSize": 12, "color": "#6E1422" },
+    "label":   { "fontFace": "Segoe UI",   "fontSize": 10, "color": "#2C2520" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
+        "border": [{ "show": true, "color": { "solid": { "color": "#E4D9C6" } }, "radius": 8 }],
+        "title": [{ "show": true, "fontColor": { "solid": { "color": "#8C1C2B" } }, "fontFamily": "Constantia", "fontSize": 13, "alignment": "left" }]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [{ "color": { "solid": { "color": "#8C1C2B" } }, "fontFamily": "Constantia", "fontSize": 30 }],
+        "categoryLabels": [{ "color": { "solid": { "color": "#7A6D5E" } }, "fontFamily": "Segoe UI", "fontSize": 10 }]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#FBF8F2" } }, "transparency": 0 }]
+      }
+    }
+  }
+}
