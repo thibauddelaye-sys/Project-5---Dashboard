@@ -68,6 +68,7 @@ app.get("/invoices", async (req, res) => {
   } catch (e) { res.status(502).json({ error: String(e) }); }
 });
 
+app.use("/vendor", express.static(path.join(__dirname, "node_modules/chart.js/dist")));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(PORT, () => {
