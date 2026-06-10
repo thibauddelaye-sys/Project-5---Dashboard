@@ -32,9 +32,13 @@ rng = np.random.default_rng(SEED)
 OUT = Path(__file__).resolve().parents[1] / "data" / "raw"
 OUT.mkdir(parents=True, exist_ok=True)
 
-# --- Pilot window: 12 months ending the most recent full month -------------
-START = pd.Timestamp("2025-06-01")
-MONTHS = pd.date_range(START, periods=12, freq="MS")
+# --- Pilot window: current year-to-date, ending the most recent full month --
+TODAY = pd.Timestamp.today().normalize()
+LAST_FULL = (TODAY.replace(day=1) - pd.Timedelta(days=1)).replace(day=1)
+START = pd.Timestamp(LAST_FULL.year, 1, 1)
+MONTHS = pd.date_range(START, LAST_FULL, freq="MS")
+if len(MONTHS) < 3:                      # very early in the year -> show a short recent window
+    MONTHS = pd.date_range(LAST_FULL - pd.DateOffset(months=2), LAST_FULL, freq="MS")
 
 # --- Manual baseline (industry benchmark, EUR, directional) -----------------
 MANUAL_COST_PER_INVOICE = 12.0      # ~€11-15 manual (HighRadius/Quadient/Nanonets)
@@ -99,17 +103,16 @@ VAT_RATE = {"STD17": 0.17, "RED3": 0.03, "ND": 0.17}  # ND still charged, just n
 # 3. Invoices — generate per-vendor across the 12 months
 # ---------------------------------------------------------------------------
 # Touchless ramp: the AI improves as the pilot matures and as more vendors move
-# to structured e-invoices. Monthly target straight-through rate:
-TOUCHLESS_RAMP = np.array([0.34, 0.41, 0.48, 0.55, 0.61, 0.66,
-                           0.70, 0.73, 0.76, 0.78, 0.80, 0.82])
+# to structured e-invoices. Monthly target straight-through rate (ramps high):
+TOUCHLESS_RAMP = np.linspace(0.86, 0.98, len(MONTHS))
 # e-invoice share also grows over the year (ViDA / Peppol tailwind)
-EINV_RAMP = np.linspace(0.18, 0.34, 12)
+EINV_RAMP = np.linspace(0.30, 0.52, len(MONTHS))
 
 rows = []
 inv_counter = 0
 for _, v in vendors.iterrows():
     # distribute the vendor's annual invoices across months (Poisson around mean/12)
-    base = v["annual_invoices"] / 12.0
+    base = v["annual_invoices"] / 12.0 * 10  # full-property volume (not a subset)
     for mi, month in enumerate(MONTHS):
         n = rng.poisson(base)
         for _ in range(int(n)):
@@ -156,7 +159,7 @@ for _, r in inv.iterrows():
     # touchless if confidence clears the month's bar AND not a tricky VAT case
     tricky = r["vat_treatment"] == "ND"  # non-deductible VAT needs human eyes
     threshold = 1.0 - TOUCHLESS_RAMP[mi]  # higher ramp -> lower threshold to pass
-    touchless = (confidence > (0.78 + threshold * 0.1)) and not (tricky and rng.random() < 0.8)
+    touchless = (confidence > (0.77 + threshold * 0.1)) and not (tricky and rng.random() < 0.8)
 
     # proposed account: usually the vendor default; occasionally the AI mis-proposes
     proposed_account = r["default_account"]

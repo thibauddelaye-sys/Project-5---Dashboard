@@ -252,20 +252,20 @@ function pageDecision(){
         <div class="insight">Straight-through processing rose from <b>${pct(k.touchless_first)}</b> to <b>${pct(k.touchless_latest)}</b> across the pilot, as the model matured and more suppliers moved to structured e-invoices (now <b>${pct(k.einvoice_share)}</b> of volume). Account-proposal accuracy held at <b>${pct(k.accuracy)}</b>, with <b>${pct(k.exception_rate)}</b> routed to a human — by design. Back-office efficiency of this order protects roughly <b>1–2 pts of GOP</b>, the margin lever that matters most while Western-Europe hotel margins sit near 33%.</div>
       </div>
     </div>
-    <div class="valnote">* Projected at the client's real volume via the calculator (page II), not raw pilot totals — see assumptions.
-      <div style="margin-top:8px"><span class="pill">robust</span>pilot KPIs measured on processed invoices &nbsp; <span class="pill amber">validate</span>baselines (manual cost/time, volume) to confirm with client</div>
+    <div class="valnote">Pilot KPIs are measured on the Jan–May 2026 run at full AP volume; the headline recommendation is the full-tool projected net benefit (page II).
+      <div style="margin-top:8px"><span class="pill">robust</span>pilot KPIs measured on processed invoices &nbsp; <span class="pill amber">validate</span>baselines &amp; full-tool estimates to confirm with client</div>
     </div>`;
   // tiles
   const tiles=[
-    ['Touchless rate', pct(k.touchless_rate), `+${Math.round((k.touchless_latest-k.touchless_first)*100)} pts over pilot`, 'touchless'],
+    ['Touchless rate', pct(k.touchless_rate), `ramped to ${pct(k.touchless_latest)}`, 'touchless'],
     ['Account accuracy', pct(k.accuracy), 'AI proposal vs validated entry', 'accuracy'],
-    ['Hours returned (YTD)', Math.round(k.hours_saved_ytd), 'finance time freed', 'hours'],
-    ['Saved (YTD)', eur(k.cost_saved_ytd), 'vs manual baseline', 'saved'],
-    ['Processing cost / invoice', '', '', 'cpi'],
-    ['e-invoice share', pct(k.einvoice_share), 'ViDA tailwind', 'einv'],
+    ['Hours returned (YTD)', Math.round(k.hours_saved_ytd).toLocaleString(), 'finance time freed', 'hours'],
+    ['Saved (YTD)', eur(k.cost_saved_ytd), 'vs €12 manual baseline', 'saved'],
+    ['Processing cost / invoice', '', 'labour · vs €12 manual', 'cpi'],
+    ['FTE freed / yr', s.annual_fte_equiv, 'annualized run-rate', 'fte'],
   ];
-  // fix cost/invoice tile to show automated cost vs manual €12
-  tiles[4][1]= eur(12 - (k.cost_saved_ytd/k.invoices_ytd)); tiles[4][2]='labour · vs €12 manual';
+  // processing cost / invoice = automated labour cost vs €12 manual
+  tiles[4][1]= eur(12 - (k.cost_saved_ytd/k.invoices_ytd));
   const g=p.querySelector('#tiles');
   tiles.forEach(t=> g.appendChild(tile(t[0],t[1],t[2],t[3])));
   return p;
@@ -367,24 +367,21 @@ function pageGovernance(){
     <div class="eyebrow">The differentiator · AI assists, humans decide</div>
     <h1>And the risk?</h1>
     <div class="sub">Every posted entry has a human behind it. The design is the compliance story.</div>
-    <div class="panel"><h3>How a single invoice flows</h3>
+    <div class="panel"><h3>How a purchase flows — order to posting</h3>
       <div class="flow">
-        <div class="step"><div class="ic">▤</div><div class="t">Invoice in</div><div class="d">email · PDF · e-invoice</div></div>
+        <div class="step"><div class="ic">▤</div><div class="t">Purchase order</div><div class="d">captured by email or upload</div></div>
         <div class="arrow">→</div>
-        <div class="step"><div class="ic">◇</div><div class="t">AI proposes</div><div class="d">account · VAT · allocation</div></div>
+        <div class="step"><div class="ic">⊞</div><div class="t">Goods received</div><div class="d">delivery note · quantities checked</div></div>
         <div class="arrow">→</div>
-        <div class="step human"><div class="ic">✓</div><div class="t">Human validates</div><div class="d">reviews &amp; approves</div></div>
+        <div class="step"><div class="ic">▦</div><div class="t">Supplier invoice</div><div class="d">captured by email or upload</div></div>
         <div class="arrow">→</div>
-        <div class="step"><div class="ic">▦</div><div class="t">Posting</div><div class="d">to the ledger</div></div>
+        <div class="step"><div class="ic">⇄</div><div class="t">3-way match + proposal</div><div class="d">PO ↔ delivery ↔ invoice · AI proposes the entry &amp; stock movement</div></div>
+        <div class="arrow">→</div>
+        <div class="step human"><div class="ic">✓</div><div class="t">Human validates</div><div class="d">reviews exceptions · approves</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><div class="ic">▣</div><div class="t">Posting</div><div class="d">expense entry + stock movement</div></div>
       </div>
-    </div>
-    <div class="panel"><h3>The same control extends across the full tool</h3>
-      <div class="flow">
-        <div class="step"><div class="ic">▤</div><div class="t">AP invoice → entry</div><div class="d">AI proposes the posting · <b>a human approves</b></div></div>
-        <div class="step"><div class="ic">⇄</div><div class="t">3-way match</div><div class="d">AI flags the discrepancy · <b>a human clears or disputes</b></div></div>
-        <div class="step"><div class="ic">▦</div><div class="t">Stock movement</div><div class="d">AI posts from the validated receipt · <b>a human owns the count</b></div></div>
-      </div>
-      <div class="filter-note" style="margin-top:10px;color:var(--muted)">Wherever the value stack claims a benefit — AP automation, 3-way match, inventory — the same principle holds: the AI proposes, a person decides. Nothing posts autonomously.</div>
+      <div class="filter-note" style="margin-top:10px;color:var(--muted)">One controlled flow across AP, 3-way match and inventory: the AI proposes the accounting entry <b>and</b> the stock movement; a person validates before anything posts. Nothing is posted autonomously.</div>
     </div>
     <div class="twocol">
       <div class="panel"><h3>EU AI Act posture</h3>
@@ -513,6 +510,7 @@ const DRILL={
   saved:['Cost saved (YTD)','Σ (€12 − automated_cost) per invoice','Manual baseline ~€12/invoice (HighRadius/Quadient). USD-derived, indicative.'],
   cpi:['Processing cost / invoice','labour: (avg minutes ÷ 60) × €45 loaded rate + €0.80 software','This is the cost to PROCESS an invoice (≈15 min of finance time), NOT the invoice amount. The loaded rate is an assumption to confirm with the client.'],
   einv:['e-invoice share','e-invoice channel ÷ all channels','Rising with ViDA / Peppol adoption (EU Commission).'],
+  fte:['FTE freed','annualized hours returned ÷ 1,600 productive h per FTE','Finance capacity freed at the run-rate — a person-equivalent, not a layoff.'],
 };
 function drill(k){const d=DRILL[k]; if(!d)return;
   document.getElementById('m-title').textContent=d[0];
