@@ -62,11 +62,26 @@ use `MAX ( Evidence[value_text] )`.
 |---|---|---|
 | The opportunity | Bar | manual vs automated: cost €12→€3, time 15→3 min |
 | Why now | Timeline | ViDA 2025 → Belgium/LU 2026 → France 2027 → LU B2B 2028–29 → EU 2030 (Regulatory rows) |
-| Cost & ROI | Cards | pilot ~€20k · ~€42k/yr at maturity · payback ~12 mo (labelled estimates — `cost_estimation/`) |
-| Opportunity sizing | What-If slicers + card | Volume × Touchless target → projected annual saving (decision input, optional) |
+| **Full-tool value stack** | **Waterfall** | `value_stack.csv`: AP automation €42k + 3-way-match recovery €10k + inventory waste €9k + stock-entry labour €4.5k − run cost €13k → **~€52.5k/yr net** (one-off €15k WC shown separately) |
+| Cost & ROI | Cards | pilot ~€20k · **~€65.5k/yr gross benefit · ~€52.5k/yr net** · payback < 12 mo (labelled estimates — `cost_estimation/`) |
+| Opportunity sizing | What-If slicers + card | Volume × Touchless target → projected AP saving (decision input, optional) |
 | Recommendation | Text box | 🟡 PILOT + go/no-go gate (touchless ≥65%, accuracy ≥90% at real volume) |
 
+> **Value-stack integrity (say this at the pitch):** the four benefit pools are **distinct, not
+> overlapping** — processing time (AP) ≠ error recovery (3-way match) ≠ stock waste ≠ stock-entry
+> labour. Every figure is a **conservative, assumption-based estimate** with its basis in
+> `value_stack.csv` / `cost_estimation/cost_analysis.md`, to be replaced by the client's real data.
+> The €15k working-capital release is a **one-off cash effect**, kept out of the recurring total.
+
+### Building the waterfall (Power BI)
+Load `data/processed/value_stack.csv`. Filter to `type = "recurring"`. Native **Waterfall**
+visual → Category = `component`, Y = `annual_value_eur` (the −€13k run cost shows as the only
+downward step → the bar lands on the **net** figure). Add two cards: **Gross benefit**
+`CALCULATE(SUM(value_stack[annual_value_eur]), value_stack[annual_value_eur] > 0, value_stack[type]="recurring")`
+and **Net benefit** `CALCULATE(SUM(value_stack[annual_value_eur]), value_stack[type]="recurring")`.
+
 ## Cost What-If (optional, labelled estimates)
+
 Parameters: **Volume (monthly)** 50–1200 (def 420), **Touchless target** 0.40–0.95 (def 0.75),
 **Finance rate €/h** 30–70 (def 45), **Manual minutes** 5–30 (def 15). Then:
 ```DAX
@@ -80,7 +95,7 @@ Projected Annual Saving = ([Manual Cost]-[Auto Cost]) * 'Volume'[Value] * 12
 ## Build order
 1. Load `ai_adoption_evidence.csv` + `hype_vs_evidence.csv` (Text/CSV). No relationships needed.
 2. Add the evidence-card measures (one per metric) + the 4 What-If parameters.
-3. Build pages 1–4; apply the red/cream/gold theme JSON.
+3. Build pages 1→4; apply the red/cream/gold theme JSON.
 4. Centrepiece for the lab: **the 98%-vs-6% contrast + the hype-vs-evidence table** — that *is*
    the "separate hype from value" deliverable, rendered.
 

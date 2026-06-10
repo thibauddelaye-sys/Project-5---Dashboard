@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<script src="/vendor/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
   :root{
     --paper:#FBF8F2; --paper2:#F4ECDF; --paper3:#FAF4E9; --card:#FFFFFF;
@@ -241,9 +241,9 @@ function pageDecision(){
     <div class="reco">
       <div><div class="tag">Recommendation</div><div class="big">🟡 Run the pilot — don't wait, don't yet invest at full scale</div></div>
       <div class="nums">
-        <div><div class="v">${eur(s.annual_cost_saving)}</div><div class="l">saved / year*</div></div>
-        <div><div class="v">${Math.round(s.annual_hours_returned)}</div><div class="l">hours returned*</div></div>
-        <div><div class="v">${s.annual_fte_equiv}</div><div class="l">FTE freed*</div></div>
+        <div><div class="v">${D.vstack?eur(D.vstack.net):'—'}</div><div class="l">net / yr — full tool</div></div>
+        <div><div class="v">${D.vstack?eur(D.vstack.gross):'—'}</div><div class="l">gross / yr</div></div>
+        <div><div class="v">&lt;12mo</div><div class="l">payback</div></div>
       </div>
     </div>
     <div class="twocol">
@@ -283,6 +283,18 @@ function pageOpportunity(){
     <div class="eyebrow">Sizing the opportunity · USALI departments</div>
     <h1>How much do we actually get back?</h1>
     <div class="sub">Move the sliders to your real numbers — the whole ROI recomputes live against the API.</div>
+    <div class="panel" style="border-top:3px solid var(--gold)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
+        <div><h3 style="margin:0">The full-tool value stack</h3>
+          <div class="filter-note" style="color:var(--muted)">AP automation + 3-way match + inventory — distinct, non-overlapping, conservative estimates.</div></div>
+        <div style="text-align:right">
+          <div style="font-family:var(--display);font-size:38px;font-weight:700;color:var(--red);line-height:1" id="vs_net">—</div>
+          <div style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">net benefit / yr · payback &lt; 12 mo</div>
+          <div class="filter-note" id="vs_extra" style="margin-top:4px;color:var(--gold)"></div></div>
+      </div>
+      <canvas id="c_vstack" height="110" style="margin-top:14px"></canvas>
+      <div class="filter-note" style="margin-top:8px;color:var(--muted)">No double-counting: processing time ≠ error recovery ≠ stock waste ≠ stock-entry labour. Estimates to confirm on the client's real volumes.</div>
+    </div>
     <div class="panel"><div class="calc">
       <div>
         <div class="ctrl"><label>Monthly invoice volume <b id="lv">420</b></label><input id="sv" type="range" min="50" max="1200" step="10" value="420"></div>
@@ -366,6 +378,14 @@ function pageGovernance(){
         <div class="step"><div class="ic">▦</div><div class="t">Posting</div><div class="d">to the ledger</div></div>
       </div>
     </div>
+    <div class="panel"><h3>The same control extends across the full tool</h3>
+      <div class="flow">
+        <div class="step"><div class="ic">▤</div><div class="t">AP invoice → entry</div><div class="d">AI proposes the posting · <b>a human approves</b></div></div>
+        <div class="step"><div class="ic">⇄</div><div class="t">3-way match</div><div class="d">AI flags the discrepancy · <b>a human clears or disputes</b></div></div>
+        <div class="step"><div class="ic">▦</div><div class="t">Stock movement</div><div class="d">AI posts from the validated receipt · <b>a human owns the count</b></div></div>
+      </div>
+      <div class="filter-note" style="margin-top:10px;color:var(--muted)">Wherever the value stack claims a benefit — AP automation, 3-way match, inventory — the same principle holds: the AI proposes, a person decides. Nothing posts autonomously.</div>
+    </div>
     <div class="twocol">
       <div class="panel"><h3>EU AI Act posture</h3>
         <div class="badge"><span class="b">Class</span> ${g.eu_ai_act_class}</div>
@@ -401,6 +421,17 @@ function drawDecisionCharts(){
 }
 function drawOpportunityCharts(){
   drawDept(); 
+  if(D.vstack){
+    document.getElementById('vs_net').textContent=eur(D.vstack.net);
+    document.getElementById('vs_extra').textContent=eur(D.vstack.gross)+' gross · +'+eur(D.vstack.one_off)+' one-off (working capital)';
+    const rows=D.vstack.rows.filter(r=>r.type==='recurring');
+    charts.vstack && charts.vstack.destroy();
+    charts.vstack=new Chart(document.getElementById('c_vstack'),{
+      type:'bar',
+      data:{labels:rows.map(r=>r.component),datasets:[{data:rows.map(r=>r.annual_value_eur),
+        backgroundColor:rows.map(r=>r.annual_value_eur<0?'#B23A48':'#8C1C2B')}]},
+      options:{...opts('€'),indexAxis:'y',plugins:{legend:{display:false}}}});
+  }
   charts.cmp && charts.cmp.destroy();
   charts.cmp=new Chart(document.getElementById('c_cmp'),{
     type:'bar',

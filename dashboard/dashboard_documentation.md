@@ -7,7 +7,7 @@
 
 ## Audience & purpose
 Built for **Cleo**, a non-technical CEO. Communication-layer: 5–7 decision-relevant metrics,
-clarity over density, every number public and cited. One question per page — invest/wait/**pilot**.
+clarity over density, every number public and cited. One question per page → invest/wait/**pilot**.
 
 ## Data sources (public, cited)
 - **`data/processed/ai_adoption_evidence.csv`** — 32 cited figures across 6 pillars (margin,

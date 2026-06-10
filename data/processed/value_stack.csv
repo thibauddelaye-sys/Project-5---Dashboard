@@ -1,0 +1,7 @@
+id,lever,component,annual_value_eur,type,basis
+V1,AP automation,Invoice processing time saved (touchless),42000,recurring,"~5,040 invoices/yr, ~78% touchless, EUR12->EUR3.9/invoice at EUR45/h loaded rate (calculator)"
+V2,3-way match,Overbilling & price-variance recovered before payment,10000,recurring,"~0.6% of ~EUR1.8M addressable supplier spend; demo caught EUR2,513 on a 3-month slice"
+V3,Inventory,Waste & shrinkage reduction (tighter receiving control),9000,recurring,~0.5 pt of F&B cost via documented quantity control at receiving (assumption)
+V4,Inventory,Manual stock-entry labour eliminated,4500,recurring,~2h/week of finance/F&B time at EUR45/h loaded (assumption)
+C1,Cost,Ongoing run cost (tooling + support + tuning),-13000,recurring,from cost_estimation/cost_analysis.md
+W1,Working capital,One-off cash release from right-sized stock,15000,one-off,~10% reduction on tied-up F&B inventory (assumption; not a recurring P&L saving)

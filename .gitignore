@@ -1,6 +1,7 @@
 venv/
+node_modules/
 .env
 __pycache__/
 *.pyc
 .railway/
-deploy/node_modules/
+.DS_Store

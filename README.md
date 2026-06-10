@@ -7,11 +7,11 @@ click through — and an honest *pilot / wait / invest* recommendation.
 
 Audience: **Cleo**, a non-technical CEO. Principle: **AI assists, humans decide.**
 
-## 🔗 Live
+## 🚀 Live
 
 - **Power BI evidence dashboard** *(the graded Project 5 deliverable)* — `dashboard/dashboard_spec.md` → `.pbix`
-- **Live web cockpit** *(bonus: a working demo of the piloted tool)* — `https://ap-cockpit-production.up.railway.app`
-- **API (source of truth for the demo)** — `https://fantastic-presence-production.up.railway.app` · `/docs`
+- **Live web cockpit** *(bonus: a working demo of the piloted tool)* — `‹your-cockpit›.up.railway.app`
+- **API (source of truth for the demo)** — `‹your-api›.up.railway.app` · `/docs`
 
 ## What it is
 
@@ -43,14 +43,18 @@ Plus a full **AI-adoption consulting case** (research → recommendation) in `re
 
 > Touchless / straight-through rate rose **~46% → ~74%** across a 12-month pilot, account
 > accuracy **~94%**, as e-invoice share grew **~26% → ~50%**.
-> Projected at the hotel's real volume: **↓ €42k/yr saved, ↓ 0.6 FTE returned** — roughly
-> breakeven in year 1 (incl. pilot), ~€29k/yr net thereafter (3-yr ROI ~90%).
+> Projected at the hotel's real volume: **≈ €42k/yr saved, ≈ 0.6 FTE returned** — roughly
+> breakeven in year 1 (incl. pilot), ~€29k/yr net thereafter (3-yr ROI ≈ 90%).
+>
+> Full-tool value stack (AP automation + 3-way match + inventory): **≈ €65.5k/yr gross,
+> ≈ €52.5k/yr net** + a one-off ~€15k working-capital release — distinct, conservative,
+> assumption-based pools (see `cost_estimation/cost_analysis.md`).
 
 > ⚠️ **Operational data is synthetic** — generated to be *plausible*, labelled as such, no real
 > company/personal data. **Market-evidence data is real & cited.** See
 > `research/01_data_assumptions.md`.
 
-## 📋 The consulting case (Project 5)
+## 🎓 The consulting case (Project 5)
 
 - **Sector:** luxury hospitality — independent 5★ hotels. **Size:** SME (~80–250 employees).
 - **Use case:** AI proposes the accounting entry for each supplier invoice; a human validates
@@ -60,7 +64,7 @@ Plus a full **AI-adoption consulting case** (research → recommendation) in `re
   ViDA / Luxembourg e-invoicing wave (B2B by 2028–29) makes structured invoices the norm.
 - **Recommendation:** 🟡 **run a 10-week, ~€20k pilot** — don't wait, don't yet scale.
 
-### 📁 Deliverables map (Project 5 rubric)
+### 📋 Deliverables map (Project 5 rubric)
 | Deliverable | File |
 |---|---|
 | Use-case discovery & selection | `research/use_case_discovery.md` |
@@ -91,15 +95,14 @@ Plus a full **AI-adoption consulting case** (research → recommendation) in `re
 ├── data/
 │   ├── raw/                     # 6 synthetic operational CSVs
 │   └── processed/ai_adoption_evidence.csv   # public, cited evidence
-│   └── processed/hype_vs_evidence.csv       # claim → evidence → verdict
 ├── deploy/                      # live web cockpit (Node + Chart.js)
-│   └── server.js · package.json · public/index.html
-├── dashboard/                   # Power BI: spec · documentation · theme · data_model · live_api_connection
+│   ├── server.js · package.json · public/index.html
+├── dashboard/                   # Power BI: data_model · measures · spec · live_api_connection · documentation
 ├── measures/measures_dax.md
 ├── research/                    # discovery · market · assumptions · opportunities/risks · hype-vs-evidence
 ├── implementation/              # solution_proposal · implementation_plan
 ├── cost_estimation/             # cost_analysis · timeline_estimate
-└── requirements.txt · .env.example · Procfile · sources.md · README.md
+├── requirements.txt · .env.example · Procfile · sources.md · README.md
 ```
 
 ## Quick start
@@ -115,7 +118,7 @@ uvicorn api.main:app --port 8000           # -> http://localhost:8000/docs
 cd deploy && npm install
 API_BASE=http://localhost:8000 npm start   # -> http://localhost:3000
 
-# 4. Power BI: follow dashboard/dashboard_spec.md + dashboard/data_model.md + measures/measures_dax.md
+# 4. Power BI: follow dashboard/data_model.md + measures/measures_dax.md
 #    (static CSV first; live API via dashboard/live_api_connection.md)
 ```
 

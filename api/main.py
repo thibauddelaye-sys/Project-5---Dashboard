@@ -59,6 +59,7 @@ def load() -> dict[str, pd.DataFrame]:
         "ap": pd.read_csv(raw / "ap_entries.csv", parse_dates=["period"]),
         "monthly": pd.read_csv(raw / "monthly_kpis.csv"),
         "evidence": pd.read_csv(DATA / "processed" / "ai_adoption_evidence.csv"),
+        "value_stack": pd.read_csv(DATA / "processed" / "value_stack.csv"),
     }
     # one joined operational frame, reused by several endpoints
     j = d["ap"].merge(
@@ -206,4 +207,17 @@ def governance(_: None = Depends(auth)):
         "share_human_reviewed": round(float((~j["touchless"]).mean()), 3),
         "non_deductible_vat_routed_to_human": int(j["vat_non_deductible"].sum()),
         "gdpr_personal_data_in_scope": "Vendor contacts only; no special-category data",
+    }
+
+
+@app.get("/api/value_stack", tags=["decision"])
+def value_stack(_: None = Depends(auth)):
+    """Full-tool value stack: distinct, non-overlapping benefit pools + run cost + one-off."""
+    v = load()["value_stack"]
+    rec = v[v["type"] == "recurring"]
+    return {
+        "rows": recs(v),
+        "gross": round(float(rec[rec["annual_value_eur"] > 0]["annual_value_eur"].sum())),
+        "net": round(float(rec["annual_value_eur"].sum())),
+        "one_off": round(float(v[v["type"] == "one-off"]["annual_value_eur"].sum())),
     }

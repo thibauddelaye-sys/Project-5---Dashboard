@@ -34,15 +34,15 @@ async function get(p) {
 async function refresh() {
   try {
     if (!TOKEN) await login();
-    const [kpis, monthly, spendDept, spendVendor, evidence, governance, savings] =
+    const [kpis, monthly, spendDept, spendVendor, evidence, governance, savings, vstack] =
       await Promise.all([
         get("/api/kpis"), get("/api/monthly"),
         get("/api/spend?by=department"), get("/api/spend?by=vendor_name"),
         get("/api/evidence"), get("/api/governance"),
-        get("/api/savings"),
+        get("/api/savings"), get("/api/value_stack"),
       ]);
     CACHE = { updated_at: new Date().toISOString(), error: null,
-              kpis, monthly, spendDept, spendVendor, evidence, governance, savings };
+              kpis, monthly, spendDept, spendVendor, evidence, governance, savings, vstack };
     console.log(`[refresh] ok @ ${CACHE.updated_at}`);
   } catch (e) {
     CACHE.error = String(e);
@@ -68,7 +68,6 @@ app.get("/invoices", async (req, res) => {
   } catch (e) { res.status(502).json({ error: String(e) }); }
 });
 
-app.use("/vendor", express.static(path.join(__dirname, "node_modules/chart.js/dist")));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(PORT, () => {

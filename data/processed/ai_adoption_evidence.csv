@@ -14,8 +14,8 @@ E012,AP cost,Handling time — manual,15.0,,minutes,Global,2025,Artsyl,vendor
 E013,AP cost,Handling time — automated,3.0,,minutes,Global,2025,Artsyl,vendor
 E014,AP cost,Teams still keying manually,68.0,,%,Global,2025,DocuClipper,vendor
 E015,AP cost,AP automation market CAGR,12.8,,% CAGR,Global,2025,Grand View via DocuClipper,vendor
-E016,Adoption,Hospitality enterprises deploying AI,6.0,~6,%,EU,2023,Eurostat,official
-E017,Adoption,Knowledge-sector enterprises deploying AI,20.0,>20,%,EU,2023,Eurostat,official
+E016,Adoption,Hospitality enterprises deploying AI,12.0,12,%,EU,2025,"Eurostat (isoc_eb_ain2), 2025 survey",official
+E017,Adoption,EU average enterprises using AI,20.0,20,%,EU,2025,"Eurostat (isoc_eb_ai), 2025 survey",official
 E018,Adoption,Hotels with a formal AI strategy,8.0,,%,Global,2025,h2c/Profitroom,vendor
 E019,Adoption,AI trust score,6.6,,/10,Global,2025,h2c/Profitroom,vendor
 E020,Adoption,AI reliance score,4.7,,/10,Global,2025,h2c/Profitroom,vendor
