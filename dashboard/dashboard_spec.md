@@ -62,8 +62,8 @@ use `MAX ( Evidence[value_text] )`.
 |---|---|---|
 | The opportunity | Bar | manual vs automated: cost €12→€3, time 15→3 min |
 | Why now | Timeline | ViDA 2025 → Belgium/LU 2026 → France 2027 → LU B2B 2028–29 → EU 2030 (Regulatory rows) |
-| **Full-tool value stack** | **Waterfall** | `value_stack.csv`: AP automation €42k + 3-way-match recovery €10k + inventory waste €9k + stock-entry labour €4.5k − run cost €13k → **~€52.5k/yr net** (one-off €15k WC shown separately) |
-| Cost & ROI | Cards | pilot ~€20k · **~€65.5k/yr gross benefit · ~€52.5k/yr net** · payback < 12 mo (labelled estimates — `cost_estimation/`) |
+| **Full-tool value stack** | **Waterfall** | `value_stack.csv`: AP automation €42k + manual-matching time €26k + 3-way recovery €10k + inventory waste €9k + stock-entry labour €19.5k − run cost €13k → **~€93.5k/yr net · ~1.2 FTE** (one-off €15k WC shown separately; FTE from labour pools only) |
+| Cost & ROI | Cards | pilot ~€20k · **~€106.5k/yr gross · ~€93.5k/yr net · ~1.2 FTE** · payback < 12 mo (labelled estimates — `cost_estimation/`) |
 | Opportunity sizing | What-If slicers + card | Volume × Touchless target → projected AP saving (decision input, optional) |
 | Recommendation | Text box | 🟡 PILOT + go/no-go gate (touchless ≥65%, accuracy ≥90% at real volume) |
 

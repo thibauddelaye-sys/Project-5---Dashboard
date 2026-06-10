@@ -252,17 +252,17 @@ function pageDecision(){
         <div class="insight">Straight-through processing rose from <b>${pct(k.touchless_first)}</b> to <b>${pct(k.touchless_latest)}</b> across the pilot, as the model matured and more suppliers moved to structured e-invoices (now <b>${pct(k.einvoice_share)}</b> of volume). Account-proposal accuracy held at <b>${pct(k.accuracy)}</b>, with <b>${pct(k.exception_rate)}</b> routed to a human — by design. Back-office efficiency of this order protects roughly <b>1–2 pts of GOP</b>, the margin lever that matters most while Western-Europe hotel margins sit near 33%.</div>
       </div>
     </div>
-    <div class="valnote">Pilot KPIs are measured on the Jan–May 2026 run at full AP volume; the headline recommendation is the full-tool projected net benefit (page II).
-      <div style="margin-top:8px"><span class="pill">robust</span>pilot KPIs measured on processed invoices &nbsp; <span class="pill amber">validate</span>baselines &amp; full-tool estimates to confirm with client</div>
+    <div class="valnote">Tiles are annual projections at the 88% touchless target; the touchless ramp below is measured (Jan–May 2026). The recommendation is the full-tool net benefit (page II).
+      <div style="margin-top:8px"><span class="pill">robust</span>touchless ramp measured on processed invoices &nbsp; <span class="pill amber">validate</span>baselines &amp; full-tool estimates to confirm with client</div>
     </div>`;
   // tiles
   const tiles=[
     ['Touchless rate', pct(k.touchless_rate), `ramped to ${pct(k.touchless_latest)}`, 'touchless'],
     ['Account accuracy', pct(k.accuracy), 'AI proposal vs validated entry', 'accuracy'],
-    ['Hours returned (YTD)', Math.round(k.hours_saved_ytd).toLocaleString(), 'finance time freed', 'hours'],
-    ['Saved (YTD)', eur(k.cost_saved_ytd), 'vs €12 manual baseline', 'saved'],
+    ['Hours returned / yr', Math.round(s.annual_hours_returned).toLocaleString(), 'projected at 88% touchless', 'hours'],
+    ['Saved / yr', eur(s.annual_cost_saving), 'AP automation, projected', 'saved'],
     ['Processing cost / invoice', '', 'labour · vs €12 manual', 'cpi'],
-    ['FTE freed / yr', s.annual_fte_equiv, 'annualized run-rate', 'fte'],
+    ['FTE freed / yr', D.vstack?D.vstack.fte_freed:'—', 'full tool · vs 0.6 for AP alone', 'fte'],
   ];
   // processing cost / invoice = automated labour cost vs €12 manual
   tiles[4][1]= eur(12 - (k.cost_saved_ytd/k.invoices_ytd));
@@ -295,17 +295,17 @@ function pageOpportunity(){
       <canvas id="c_vstack" height="110" style="margin-top:14px"></canvas>
       <div class="filter-note" style="margin-top:8px;color:var(--muted)">No double-counting: processing time ≠ error recovery ≠ stock waste ≠ stock-entry labour. Estimates to confirm on the client's real volumes.</div>
     </div>
-    <div class="panel"><div class="calc">
+    <div class="panel"><h3>AP automation — adjust to your numbers</h3><div class="calc">
       <div>
         <div class="ctrl"><label>Monthly invoice volume <b id="lv">420</b></label><input id="sv" type="range" min="50" max="1200" step="10" value="420"></div>
-        <div class="ctrl"><label>Touchless target <b id="lt">75%</b></label><input id="st" type="range" min="40" max="95" step="1" value="75"></div>
+        <div class="ctrl"><label>Touchless target <b id="lt">88%</b></label><input id="st" type="range" min="40" max="95" step="1" value="88"></div>
         <div class="ctrl"><label>Manual handling time <b id="lm">15 min</b></label><input id="sm" type="range" min="5" max="30" step="1" value="15"></div>
         <div class="ctrl"><label>Finance loaded rate <b id="lr">€45/h</b></label><input id="sr" type="range" min="30" max="70" step="1" value="45"></div>
       </div>
       <div class="outs">
-        <div class="out"><div class="l">Annual cost saving</div><div class="v" id="o_save">—</div></div>
+        <div class="out"><div class="l">AP cost saving / yr</div><div class="v" id="o_save">—</div></div>
         <div class="out alt"><div class="l">Hours returned / yr</div><div class="v" id="o_hours">—</div></div>
-        <div class="out alt"><div class="l">FTE equivalent</div><div class="v" id="o_fte">—</div></div>
+        <div class="out alt"><div class="l">FTE (AP only)</div><div class="v" id="o_fte">—</div></div>
         <div class="out"><div class="l">Saving / invoice</div><div class="v" id="o_per">—</div></div>
       </div>
     </div>
@@ -420,7 +420,7 @@ function drawOpportunityCharts(){
   drawDept(); 
   if(D.vstack){
     document.getElementById('vs_net').textContent=eur(D.vstack.net);
-    document.getElementById('vs_extra').textContent=eur(D.vstack.gross)+' gross · +'+eur(D.vstack.one_off)+' one-off (working capital)';
+    document.getElementById('vs_extra').textContent=eur(D.vstack.gross)+' gross · '+D.vstack.fte_freed+' FTE freed · +'+eur(D.vstack.one_off)+' one-off (WC)';
     const rows=D.vstack.rows.filter(r=>r.type==='recurring');
     charts.vstack && charts.vstack.destroy();
     charts.vstack=new Chart(document.getElementById('c_vstack'),{

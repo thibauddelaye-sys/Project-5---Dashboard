@@ -158,7 +158,7 @@ def evidence(pillar: str | None = None, _: None = Depends(auth)):
 # --------------------------------------------------------------------------- savings calc
 @app.get("/api/savings", tags=["decision"])
 def savings(monthly_volume: int = Query(420, ge=1),
-            touchless_target: float = Query(0.75, ge=0, le=1),
+            touchless_target: float = Query(0.88, ge=0, le=1),
             manual_minutes: float = Query(MANUAL_MIN),
             rate: float = Query(RATE),
             auto_minutes_touchless: float = 2.5,
@@ -220,4 +220,5 @@ def value_stack(_: None = Depends(auth)):
         "gross": round(float(rec[rec["annual_value_eur"] > 0]["annual_value_eur"].sum())),
         "net": round(float(rec["annual_value_eur"].sum())),
         "one_off": round(float(v[v["type"] == "one-off"]["annual_value_eur"].sum())),
+        "fte_freed": round(float(rec[rec["kind"] == "labour"]["annual_value_eur"].sum()) / (1600 * 45), 2),
     }

@@ -46,9 +46,9 @@ Plus a full **AI-adoption consulting case** (research → recommendation) in `re
 > Projected at the hotel's real volume: **≈ €42k/yr saved, ≈ 0.6 FTE returned** — roughly
 > breakeven in year 1 (incl. pilot), ~€29k/yr net thereafter (3-yr ROI ≈ 90%).
 >
-> Full-tool value stack (AP automation + 3-way match + inventory): **≈ €65.5k/yr gross,
-> ≈ €52.5k/yr net** + a one-off ~€15k working-capital release — distinct, conservative,
-> assumption-based pools (see `cost_estimation/cost_analysis.md`).
+> Full-tool value stack (AP automation + 3-way match + inventory): **≈ €106.5k/yr gross,
+> ≈ €93.5k/yr net, ≈ 1.2 FTE freed** + a one-off ~€15k working-capital release — distinct,
+> conservative, assumption-based pools (see `cost_estimation/cost_analysis.md`).
 
 > ⚠️ **Operational data is synthetic** — generated to be *plausible*, labelled as such, no real
 > company/personal data. **Market-evidence data is real & cited.** See

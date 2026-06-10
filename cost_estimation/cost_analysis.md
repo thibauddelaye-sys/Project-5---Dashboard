@@ -62,18 +62,25 @@ build: AP automation + 3-way match + inventory) unlocks three further, **non-ove
 pools. All are **conservative, assumption-based estimates** for one SME 5★ hotel — to be
 replaced by the client's real data. Source rows: `data/processed/value_stack.csv`.
 
-| Value pool | €/yr | Basis (to validate) |
-|---|---|---|
-| AP automation — invoice processing time saved | **42,000** | ~5,040 invoices/yr, ~78% touchless, €12→€3.9 at €45/h |
-| 3-way match — overbilling & price-variance recovered | **10,000** | ~0.6% of ~€1.8M addressable supplier spend; demo caught €2,513 on a 3-month slice |
-| Inventory — waste & shrinkage reduction | **9,000** | ~0.5 pt of F&B cost via documented receiving control |
-| Inventory — manual stock-entry labour eliminated | **4,500** | ~2 h/week at €45/h loaded |
-| **Gross recurring benefit** | **65,500** | |
-| Less: ongoing run cost | (13,000) | tooling + support + tuning |
-| **Net recurring benefit** | **≈ 52,500 / yr** | |
-| One-off working-capital release | +15,000 | ~10% reduction on tied-up F&B inventory (cash, not P&L — shown separately) |
+| Value pool | €/yr | Kind | Basis (to validate) |
+|---|---|---|---|
+| AP automation — invoice processing time saved | **42,000** | labour | ~5,040 invoices/yr, ~88% touchless target, €12→€3.9 at €45/h |
+| 3-way match — manual PO/delivery/invoice matching time saved | **26,000** | labour | ~1.5 days/week of manual three-way reconciliation across F&B suppliers, at €45/h |
+| 3-way match — overbilling & price-variance recovered | **10,000** | cash | ~0.6% of ~€1.8M addressable supplier spend |
+| Inventory — waste & shrinkage reduction | **9,000** | cash | ~0.5 pt of F&B cost via documented receiving control |
+| Inventory — manual stock-entry labour eliminated | **19,500** | labour | ~4.5 full days/month encoding the month's orders & deliveries before close, at €45/h |
+| **Gross recurring benefit** | **106,500** | | |
+| Less: ongoing run cost | (13,000) | cost | tooling + support + tuning |
+| **Net recurring benefit** | **≈ 93,500 / yr** | | |
+| One-off working-capital release | +15,000 | one-off | ~10% reduction on tied-up F&B inventory (cash, not P&L — shown separately) |
 
-**No double-counting:** processing efficiency (AP) ≠ error recovery (3-way match) ≠ stock waste ≠
-stock-entry labour — four distinct pools. **Payback:** the ~€20k pilot is recovered in well under
-a year on the net recurring benefit alone. This is what turns the decision into a no-brainer —
-*provided* the assumptions are confirmed on the client's real volumes and spend.
+**FTE freed ≈ 1.2** — only the **labour** pools count toward FTE (cash recovery and waste are €, not
+time): (42,000 + 26,000 + 19,500) ÷ €45/h ÷ 1,600 productive h = **1.22 FTE**. The 3-way-match
+*cash* recovery (€10k) is deliberately **not** counted as time — that would double-count the
+matching-labour pool.
+
+**No double-counting:** five distinct pools — AP processing time, manual matching time, error
+recovery (cash), stock waste (cash), stock-entry time. Time pools feed FTE; cash pools do not.
+**Payback:** the ~€20k pilot is recovered in a few months on the net recurring benefit. These are
+**upper-realistic, assumption-based** figures — the matching-time and stock-entry-time pools are
+the main swing factors and must be confirmed on the client's real processes.

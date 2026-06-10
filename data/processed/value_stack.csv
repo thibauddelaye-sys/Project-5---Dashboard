@@ -1,7 +1,8 @@
-id,lever,component,annual_value_eur,type,basis
-V1,AP automation,Invoice processing time saved (touchless),42000,recurring,"~5,040 invoices/yr, ~78% touchless, EUR12->EUR3.9/invoice at EUR45/h loaded rate (calculator)"
-V2,3-way match,Overbilling & price-variance recovered before payment,10000,recurring,"~0.6% of ~EUR1.8M addressable supplier spend; demo caught EUR2,513 on a 3-month slice"
-V3,Inventory,Waste & shrinkage reduction (tighter receiving control),9000,recurring,~0.5 pt of F&B cost via documented quantity control at receiving (assumption)
-V4,Inventory,Manual stock-entry labour eliminated,11000,recurring,"~2.5 full days/month manually encoding the month's orders & deliveries before month-end close, at EUR45/h"
-C1,Cost,Ongoing run cost (tooling + support + tuning),-13000,recurring,from cost_estimation/cost_analysis.md
-W1,Working capital,One-off cash release from right-sized stock,15000,one-off,~10% reduction on tied-up F&B inventory (assumption; not a recurring P&L saving)
+id,lever,component,annual_value_eur,type,kind,basis
+V1,AP automation,Invoice processing time saved (touchless),42000,recurring,labour,"~5,040 invoices/yr, ~78% touchless, EUR12->EUR3.9 at EUR45/h"
+V2,3-way match,Manual PO/delivery/invoice matching time saved,26000,recurring,labour,"~1.5 days/week of manual three-way reconciliation across F&B suppliers, at EUR45/h"
+V3,3-way match,Overbilling & price-variance recovered before payment,10000,recurring,cash,~0.6% of ~EUR1.8M addressable supplier spend
+V4,Inventory,Waste & shrinkage reduction (tighter receiving control),9000,recurring,cash,~0.5 pt of F&B cost via documented receiving control
+V5,Inventory,Manual stock-entry labour eliminated,19500,recurring,labour,"~4.5 full days/month encoding the month's orders & deliveries before close, at EUR45/h"
+C1,Cost,Ongoing run cost (tooling + support + tuning),-13000,recurring,cost,tooling + support + tuning
+W1,Working capital,One-off cash release from right-sized stock,15000,one-off,oneoff,"~10% reduction on tied-up F&B inventory (cash, not P&L)"
