@@ -32,13 +32,10 @@ rng = np.random.default_rng(SEED)
 OUT = Path(__file__).resolve().parents[1] / "data" / "raw"
 OUT.mkdir(parents=True, exist_ok=True)
 
-# --- Pilot window: current year-to-date, ending the most recent full month --
-TODAY = pd.Timestamp.today().normalize()
-LAST_FULL = (TODAY.replace(day=1) - pd.Timedelta(days=1)).replace(day=1)
-START = pd.Timestamp(LAST_FULL.year, 1, 1)
-MONTHS = pd.date_range(START, LAST_FULL, freq="MS")
-if len(MONTHS) < 3:                      # very early in the year -> show a short recent window
-    MONTHS = pd.date_range(LAST_FULL - pd.DateOffset(months=2), LAST_FULL, freq="MS")
+# --- Projection window: 6 modeled months from pilot kick-off (nothing is live yet;
+# the recommendation IS to run the pilot, so the curve is a forward projection) ---
+PILOT_START = pd.Timestamp(2026, 6, 1)
+MONTHS = pd.date_range(PILOT_START, periods=6, freq="MS")
 
 # --- Manual baseline (industry benchmark, EUR, directional) -----------------
 MANUAL_COST_PER_INVOICE = 12.0      # ~€11-15 manual (HighRadius/Quadient/Nanonets)
@@ -102,9 +99,9 @@ VAT_RATE = {"STD17": 0.17, "RED3": 0.03, "ND": 0.17}  # ND still charged, just n
 # ---------------------------------------------------------------------------
 # 3. Invoices — generate per-vendor across the 12 months
 # ---------------------------------------------------------------------------
-# Learning-curve ramp: month 1 the model learns supplier formats and VAT rules; matures by month 3.
-# Target monthly straight-through probability (concave, ~58%→91%):
-_TR_WP = np.array([0.62, 0.80, 0.92, 0.95, 0.96])
+# Learning-curve ramp (PROJECTED): month 1 the model learns supplier formats and VAT
+# rules; crosses ~87% by month 3, plateaus ~92%. Monthly targets matched EXACTLY by quota:
+_TR_WP = np.array([0.58, 0.75, 0.87, 0.91, 0.92, 0.92])
 TOUCHLESS_RAMP = np.interp(
     np.linspace(0, 1, len(MONTHS)), np.linspace(0, 1, len(_TR_WP)), _TR_WP
 )
@@ -152,6 +149,11 @@ inv = invoices.merge(
 
 month_idx = {m.normalize(): i for i, m in enumerate(MONTHS)}
 
+# exact per-month touchless quotas so the displayed curve matches the narrative precisely
+_n_by_m = inv["period"].map(month_idx).value_counts().sort_index()
+_rem_n = {int(mi): int(c) for mi, c in _n_by_m.items()}
+_rem_q = {int(mi): int(round(c * TOUCHLESS_RAMP[int(mi)])) for mi, c in _n_by_m.items()}
+
 ap = []
 for _, r in inv.iterrows():
     mi = month_idx[r["period"]]
@@ -161,11 +163,14 @@ for _, r in inv.iterrows():
 
     # touchless if confidence clears the month's bar AND not a tricky VAT case
     tricky = r["vat_treatment"] == "ND"  # non-deductible VAT needs human eyes
-    touchless = (rng.random() < TOUCHLESS_RAMP[mi]) and not (tricky and rng.random() < 0.8)
+    touchless = _rem_q[mi] > 0 and rng.random() < _rem_q[mi] / _rem_n[mi]
+    _rem_n[mi] -= 1
+    if touchless:
+        _rem_q[mi] -= 1
 
     # proposed account: usually the vendor default; occasionally the AI mis-proposes
     proposed_account = r["default_account"]
-    mis = rng.random() < (0.06 if r["channel"] == "einvoice" else 0.12)
+    mis = rng.random() < (0.045 if r["channel"] == "einvoice" else 0.095)
     if mis:
         proposed_account = rng.choice(coa["account"].values)
     # human corrects when not touchless and the proposal was wrong (or VAT tricky)

@@ -249,17 +249,17 @@ function pageDecision(){
       </div>
     </div>
     <div class="twocol">
-      <div class="panel"><h3>Touchless rate — the pilot ramp</h3><canvas id="c_touchless" height="150"></canvas></div>
+      <div class="panel"><h3>Touchless rate — projected learning curve</h3><canvas id="c_touchless" height="150"></canvas></div>
       <div class="panel"><h3>The AI's read</h3>
-        <div class="insight">The model started near <b>${pct(k.touchless_first)}</b> in January — it was learning this hotel's specific supplier formats, account-mapping rules and VAT quirks. By month 3 it had crossed <b>~87%</b>; by month 4 it held above <b>88%</b>. Today's rate of <b>${pct(k.touchless_latest)}</b> is consistent with the <b>88%</b> mature-state target used in the projections. Account-proposal accuracy is <b>${pct(k.accuracy)}</b>, with <b>${pct(k.exception_rate)}</b> still routed to a human by design — the model flags what it doesn't know. Back-office automation of this scale protects roughly <b>1–2 pts of GOP</b>, the margin lever that matters most while Western-Europe hotel margins sit near 33%.</div>
+        <div class="insight">The model will start near <b>${pct(k.touchless_first)}</b> in month 1 — it has to learn this hotel's specific supplier formats, account-mapping rules and VAT quirks. It crosses <b>~87%</b> by month 3 and holds <b>${pct(k.touchless_latest)}</b> from month 5. The financial projections deliberately assume only <b>88%</b> — below the modeled plateau. Account-proposal accuracy is modeled at <b>${pct(k.accuracy)}</b>, with <b>${pct(k.exception_rate)}</b> routed to a human by design — the model flags what it doesn't know. Back-office automation of this scale protects roughly <b>1–2 pts of GOP</b>, the margin lever that matters most while Western-Europe hotel margins sit near 33%.</div>
       </div>
     </div>
-    <div class="valnote">Tiles are annual projections at the 88% touchless target; the touchless ramp below is measured (Jan–May 2026). The concave shape reflects the model's adaptation phase — learning supplier formats, account-mapping rules and VAT logic before reaching steady state.
-      <div style="margin-top:8px"><span class="pill">robust</span>touchless ramp measured on processed invoices — the learning curve is real &nbsp; <span class="pill amber">validate</span>baselines &amp; full-tool estimates to confirm with client</div>
+    <div class="valnote">All operational KPIs are a modeled six-month projection from pilot kick-off (Jun–Nov 2026) — nothing is live yet; the pilot exists to replace this curve with measured data. Financial projections conservatively assume 88% touchless, below the modeled plateau.
+      <div style="margin-top:8px"><span class="pill">robust</span>market evidence (page III) is real public data &nbsp; <span class="pill amber">validate</span>operational curve &amp; baselines are modeled — the pilot's go/no-go gate confirms them</div>
     </div>`;
   // tiles
   const tiles=[
-    ['Touchless rate', pct(k.touchless_rate), `ramped to ${pct(k.touchless_latest)}`, 'touchless'],
+    ['Touchless rate (projected)', pct(k.touchless_latest), `from ${pct(k.touchless_first)} in month 1 · plan assumes 88%`, 'touchless'],
     ['Account accuracy', pct(k.accuracy), 'AI proposal vs validated entry', 'accuracy'],
     ['Hours returned / yr', Math.round(s.annual_hours_returned).toLocaleString(), 'projected at 88% touchless', 'hours'],
     ['Saved / yr', eur(s.annual_cost_saving), 'AP automation, projected', 'saved'],
@@ -533,7 +533,7 @@ async function runCalc(){
 
 /* ---------------- DRILL MODAL ---------------- */
 const DRILL={
-  touchless:['Touchless rate','touchless invoices ÷ total invoices','Synthetic pilot data (ap_entries.csv). An invoice is touchless when the AI proposal is accepted with no human correction.'],
+  touchless:['Touchless rate (projected)','touchless invoices ÷ total invoices, per modeled month','Modeled adoption curve (simulation, ap_entries.csv). An invoice is touchless when the AI proposal would be accepted with no human correction — the pilot measures this for real.'],
   accuracy:['Account accuracy','final_account == vendor default account','Backtest of AI-proposed vs validated entries.'],
   hours:['Hours returned','Σ (manual_minutes − actual_minutes) ÷ 60','Manual baseline 15 min (Artsyl). Validate with client.'],
   saved:['Cost saved (YTD)','Σ (€12 − automated_cost) per invoice','Manual baseline ~€12/invoice (HighRadius/Quadient). USD-derived, indicative.'],
