@@ -75,6 +75,12 @@ def recs(df: pd.DataFrame) -> list[dict]:
     return json.loads(df.to_json(orient="records", date_format="iso"))
 
 
+# --------------------------------------------------------------------------- health
+@app.get("/health", tags=["health"])
+def health():
+    return {"status": "ok"}
+
+
 # --------------------------------------------------------------------------- auth
 @app.post("/auth/token", tags=["auth"])
 def token(username: str = Form(...), password: str = Form(...)):
