@@ -102,9 +102,12 @@ VAT_RATE = {"STD17": 0.17, "RED3": 0.03, "ND": 0.17}  # ND still charged, just n
 # ---------------------------------------------------------------------------
 # 3. Invoices — generate per-vendor across the 12 months
 # ---------------------------------------------------------------------------
-# Touchless ramp: the AI improves as the pilot matures and as more vendors move
-# to structured e-invoices. Monthly target straight-through rate (ramps high):
-TOUCHLESS_RAMP = np.linspace(0.86, 0.98, len(MONTHS))
+# Learning-curve ramp: month 1 the model learns supplier formats and VAT rules; matures by month 3.
+# Target monthly straight-through probability (concave, ~58%→91%):
+_TR_WP = np.array([0.62, 0.80, 0.92, 0.95, 0.96])
+TOUCHLESS_RAMP = np.interp(
+    np.linspace(0, 1, len(MONTHS)), np.linspace(0, 1, len(_TR_WP)), _TR_WP
+)
 # e-invoice share also grows over the year (ViDA / Peppol tailwind)
 EINV_RAMP = np.linspace(0.30, 0.52, len(MONTHS))
 
@@ -158,8 +161,7 @@ for _, r in inv.iterrows():
 
     # touchless if confidence clears the month's bar AND not a tricky VAT case
     tricky = r["vat_treatment"] == "ND"  # non-deductible VAT needs human eyes
-    threshold = 1.0 - TOUCHLESS_RAMP[mi]  # higher ramp -> lower threshold to pass
-    touchless = (confidence > (0.77 + threshold * 0.1)) and not (tricky and rng.random() < 0.8)
+    touchless = (rng.random() < TOUCHLESS_RAMP[mi]) and not (tricky and rng.random() < 0.8)
 
     # proposed account: usually the vendor default; occasionally the AI mis-proposes
     proposed_account = r["default_account"]

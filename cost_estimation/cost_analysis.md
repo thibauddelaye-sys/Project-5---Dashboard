@@ -4,26 +4,30 @@
 > planning estimates**, labelled, to be replaced by the client's real numbers (the dashboard
 > recomputes everything live). Currency: EUR.
 
-## Pilot cost (10 weeks) — ~€20k
+## Pilot cost (10 weeks) — €20,000
 
-| Item | Estimate | Basis |
-|---|---|---|
-| Solution build & integration (capture → AI proposal → validation UI) | €15,300 | ~18 days @ €850/day |
-| Tooling during pilot (LLM/IDP usage + hosting) | €1,200 | ~€400/mo × 3 |
-| Finance team time (validation + training) | €1,350 | ~3 h/wk × 10 × €45/h |
-| Contingency (10%) | €1,650 | — |
-| **Total pilot** | **≈ €19,500** | |
+| Item | Estimate |
+|---|---|
+| Discovery & process mapping | €3,000 |
+| Model adaptation & configuration *(extraction tuned to this hotel's supplier formats, account-mapping rules, VAT logic)* | €7,000 |
+| Integration & deployment | €5,000 |
+| Training & change management | €2,500 |
+| Pilot supervision & go/no-go evaluation | €2,500 |
+| **Total pilot** | **€20,000** |
 
-## Ongoing run cost — ~€13k/year (after rollout)
+## Ongoing run cost — €13,000 / year (after rollout)
 
-| Item | Estimate | Basis |
-|---|---|---|
-| Tooling/hosting at scale (~5,000 invoices/yr) | €4,800 | usage + hosting |
-| Support & maintenance | €5,100 | ~0.5 day/mo @ €850 |
-| Model/rule tuning + e-invoicing adaptation | €3,000 | periodic |
-| **Total ongoing / yr** | **≈ €12,900** | |
+> The **€13,000 run total equals row C1** of `data/processed/value_stack.csv` and is deducted directly in the net benefit calculation (gross €106,500 − €13,000 = net **€93,500**).
 
-> One-off rollout hardening (Phase 2) ≈ €8,000, counted in year 1.
+| Item | Estimate |
+|---|---|
+| LLM usage (per-invoice extraction, full volume) | €2,000 |
+| Hosting & infrastructure | €2,000 |
+| Support, monitoring & maintenance | €5,000 |
+| Ongoing model tuning & quarterly re-adaptation | €4,000 |
+| **Total / yr** | **€13,000** |
+
+> Model adaptation is budgeted **twice by design**: once to teach the model this hotel's supplier formats (one-off pilot), then to keep it sharp as invoice formats and account rules evolve (run). The learning curve visible in the pilot data reflects this initial adaptation phase.
 
 ## Benefit (at maturity, real volume)
 
@@ -40,7 +44,7 @@ full-property volume — the pilot itself runs on a ~500/yr subset):
 
 | Horizon | Cost | Saving | Net |
 |---|---|---|---|
-| **Year 1** (pilot €19.5k + rollout €8k + run €13k) | ≈ €40,400 | ≈ €42,000 | **≈ +€1,600 (≈ breakeven)** |
+| **Year 1** (pilot €20k + rollout €8k + run €13k) | ≈ €41,000 | ≈ €42,000 | **≈ +€1,000 (≈ breakeven)** |
 | **Year 2** | ≈ €12,900 | ≈ €42,000 | **≈ +€29,000** |
 | **Year 3** | ≈ €12,900 | ≈ €42,000 | **≈ +€29,000** |
 | **3-year cumulative** | ≈ €66,200 | ≈ €126,000 | **≈ +€59,800 · ROI ≈ 90%** |

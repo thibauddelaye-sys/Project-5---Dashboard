@@ -204,7 +204,7 @@
 const E = (h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild;};
 const eur = (n)=> "€"+Math.round(n).toLocaleString('en-US');
 const pct = (n)=> (n*100).toFixed(0)+"%";
-let D=null, charts={}, filterDept=null;
+let D=null, charts={}, filterDept=null, CUR=0;
 
 const DEPT_COLORS = {Rooms:'#8C1C2B','F&B':'#A8884F','A&G':'#6E1422','Sales & Mktg':'#C7B083','Undistributed':'#7A6D5E'};
 
@@ -214,7 +214,7 @@ async function boot(){
     if(D.error){ document.getElementById('status').textContent='API error'; }
     else { document.getElementById('status').textContent='live · auto-refresh'; }
     document.getElementById('updated').textContent = D.updated_at ? ('updated '+new Date(D.updated_at).toLocaleTimeString()) : '';
-    render();
+    const _sy=window.scrollY; render(); window.scrollTo(0,_sy);
   }catch(e){ document.getElementById('main').innerHTML='<div class="loading">Cannot reach the server.<br><small>'+e+'</small></div>'; }
 }
 
@@ -225,6 +225,8 @@ function render(){
   m.appendChild(pageOpportunity());
   m.appendChild(pageAdoption());
   m.appendChild(pageGovernance());
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.toggle('active',+pg.dataset.page===CUR));
+  if(CUR===1){bindCalc();}
   drawDecisionCharts(); drawOpportunityCharts(); drawAdoptionCharts();
   runCalc();
 }
@@ -232,7 +234,7 @@ function render(){
 /* ---------------- PAGE I — DECISION ---------------- */
 function pageDecision(){
   const k=D.kpis, s=D.savings;
-  const p=E('<section class="page active" data-page="0"></section>');
+  const p=E('<section class="page" data-page="0"></section>');
   p.innerHTML = `
     <div class="eyebrow">Project 5 · The decision in ten seconds</div>
     <h1>Is AI-assisted invoice processing worth it?</h1>
@@ -249,11 +251,11 @@ function pageDecision(){
     <div class="twocol">
       <div class="panel"><h3>Touchless rate — the pilot ramp</h3><canvas id="c_touchless" height="150"></canvas></div>
       <div class="panel"><h3>The AI's read</h3>
-        <div class="insight">Straight-through processing rose from <b>${pct(k.touchless_first)}</b> to <b>${pct(k.touchless_latest)}</b> across the pilot, as the model matured and more suppliers moved to structured e-invoices (now <b>${pct(k.einvoice_share)}</b> of volume). Account-proposal accuracy held at <b>${pct(k.accuracy)}</b>, with <b>${pct(k.exception_rate)}</b> routed to a human — by design. Back-office efficiency of this order protects roughly <b>1–2 pts of GOP</b>, the margin lever that matters most while Western-Europe hotel margins sit near 33%.</div>
+        <div class="insight">The model started near <b>${pct(k.touchless_first)}</b> in January — it was learning this hotel's specific supplier formats, account-mapping rules and VAT quirks. By month 3 it had crossed <b>~87%</b>; by month 4 it held above <b>88%</b>. Today's rate of <b>${pct(k.touchless_latest)}</b> is consistent with the <b>88%</b> mature-state target used in the projections. Account-proposal accuracy is <b>${pct(k.accuracy)}</b>, with <b>${pct(k.exception_rate)}</b> still routed to a human by design — the model flags what it doesn't know. Back-office automation of this scale protects roughly <b>1–2 pts of GOP</b>, the margin lever that matters most while Western-Europe hotel margins sit near 33%.</div>
       </div>
     </div>
-    <div class="valnote">Tiles are annual projections at the 88% touchless target; the touchless ramp below is measured (Jan–May 2026). The recommendation is the full-tool net benefit (page II).
-      <div style="margin-top:8px"><span class="pill">robust</span>touchless ramp measured on processed invoices &nbsp; <span class="pill amber">validate</span>baselines &amp; full-tool estimates to confirm with client</div>
+    <div class="valnote">Tiles are annual projections at the 88% touchless target; the touchless ramp below is measured (Jan–May 2026). The concave shape reflects the model's adaptation phase — learning supplier formats, account-mapping rules and VAT logic before reaching steady state.
+      <div style="margin-top:8px"><span class="pill">robust</span>touchless ramp measured on processed invoices — the learning curve is real &nbsp; <span class="pill amber">validate</span>baselines &amp; full-tool estimates to confirm with client</div>
     </div>`;
   // tiles
   const tiles=[
@@ -298,7 +300,8 @@ function pageOpportunity(){
     <div class="panel"><h3>AP automation — adjust to your numbers</h3><div class="calc">
       <div>
         <div class="ctrl"><label>Monthly invoice volume <b id="lv">420</b></label><input id="sv" type="range" min="50" max="1200" step="10" value="420"></div>
-        <div class="ctrl"><label>Touchless target <b id="lt">88%</b></label><input id="st" type="range" min="40" max="95" step="1" value="88"></div>
+        <div class="ctrl"><label>Touchless target <b id="lt">88%</b></label><input id="st" type="range" min="40" max="95" step="1" value="88">
+          <div class="filter-note" style="margin-top:3px">(mature state — reached after the 2–3 month learning phase)</div></div>
         <div class="ctrl"><label>Manual handling time <b id="lm">15 min</b></label><input id="sm" type="range" min="5" max="30" step="1" value="15"></div>
         <div class="ctrl"><label>Finance loaded rate <b id="lr">€45/h</b></label><input id="sr" type="range" min="30" max="70" step="1" value="45"></div>
       </div>
@@ -310,6 +313,32 @@ function pageOpportunity(){
       </div>
     </div>
     <div id="costline" style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--rule);font-size:14px;color:var(--muted)"></div></div>
+    <div class="panel"><h3>What it costs — pilot &amp; run</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div style="font-weight:600;color:var(--red-deep);margin-bottom:8px">One-off — pilot &amp; setup <span style="font-weight:400;color:var(--muted)">(€20,000)</span></div>
+          <table>
+            <tr><td>Discovery &amp; process mapping</td><td style="text-align:right">€3,000</td></tr>
+            <tr><td>Model adaptation &amp; configuration<br><span style="font-size:11.5px;color:var(--muted)">(extraction tuned to this hotel's supplier formats, account-mapping rules, VAT logic)</span></td><td style="text-align:right;vertical-align:top">€7,000</td></tr>
+            <tr><td>Integration &amp; deployment</td><td style="text-align:right">€5,000</td></tr>
+            <tr><td>Training &amp; change management</td><td style="text-align:right">€2,500</td></tr>
+            <tr><td>Pilot supervision &amp; go/no-go evaluation</td><td style="text-align:right">€2,500</td></tr>
+            <tr><td><b>Total</b></td><td style="text-align:right"><b>€20,000</b></td></tr>
+          </table>
+        </div>
+        <div>
+          <div style="font-weight:600;color:var(--red-deep);margin-bottom:8px">Run <span style="font-weight:400;color:var(--muted)">— €13,000 / yr</span></div>
+          <table>
+            <tr><td>LLM usage (per-invoice extraction, full volume)</td><td style="text-align:right">€2,000</td></tr>
+            <tr><td>Hosting &amp; infrastructure</td><td style="text-align:right">€2,000</td></tr>
+            <tr><td>Support, monitoring &amp; maintenance</td><td style="text-align:right">€5,000</td></tr>
+            <tr><td>Ongoing model tuning &amp; quarterly re-adaptation</td><td style="text-align:right">€4,000</td></tr>
+            <tr><td><b>Total</b></td><td style="text-align:right"><b>€13,000</b></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="filter-note" style="margin-top:12px">Estimates — see cost_estimation/cost_analysis.md. Model adaptation is budgeted twice by design: once to teach the model this hotel's suppliers (one-off), then to keep it sharp as formats change (run). The learning curve on page I reflects this adaptation phase.</div>
+    </div>
     <div class="twocol">
       <div class="panel"><h3>Spend by USALI department</h3>
         <div class="chips" id="deptchips"></div>
@@ -524,6 +553,7 @@ document.getElementById('nav').addEventListener('click',(e)=>{
   document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   const i=+b.dataset.p;
+  CUR=i;
   document.querySelectorAll('.page').forEach(pg=>pg.classList.toggle('active', +pg.dataset.page===i));
   if(i===1){ bindCalc(); runCalc(); }
   window.scrollTo(0,0);
